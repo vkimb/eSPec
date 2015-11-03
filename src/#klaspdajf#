@@ -1,0 +1,1000 @@
+ 1007  cd ..
+ 1008  ls
+ 1009  cd datpro2.0
+ 1010  ls
+ 1011  cd src/
+ 1012  ls
+ 1013  cd ..
+ 1014  ls
+ 1015  ./datpro 1 1 teste_dicloroetileno.body 
+ 1016  ls
+ 1017  cd ..
+ 1018  ls
+ 1019  cd projphase/
+ 1020  ls
+ 1021  cd ..
+ 1022  ls
+ 1023  ssh arrhenius 
+ 1024  ls
+ 1025  cd sweden_jobs/
+ 1026  ls
+ 1027  cd Raman_CS2/
+ 1028  ls
+ 1029  cd rovib
+ 1030  ls
+ 1031  emacs rovib.f
+ 1032  cd ..
+ 1033  loadifort 
+ 1034  make
+ 1035  loadifort 
+ 1036  make
+ 1037  cd ../src/
+ 1038  loadifort 
+ 1039  emacs readallspl.f &
+ 1040  emacs main.c
+ 1041  emacs main.c&
+ 1042  ls
+ 1043  grep print *
+ 1044  grep "print " *
+ 1045  emacs backup_main.c 
+ 1046  emacs splinesurf.f&
+ 1047  cd programming/
+ 1048  ls
+ 1049  cd FluxVE
+ 1050  ls
+ 1051  cd testd/
+ 1052  ls
+ 1053  ./fluxve 
+ 1054  head ReIm_0001.dat 
+ 1055  ./fluxve 
+ 1056  head ReIm_0001.dat 
+ 1057  ./fluxve 
+ 1058  head ReIm_0001.dat 
+ 1059  ./fluxve 
+ 1060  ulimit -s unlimited
+ 1061  ./fluxve 
+ 1062  ls
+ 1063  ./fluxve 
+ 1064  ./fluxve > lopasd
+ 1065  emacs lopasd 
+ 1066  ./fluxve > lopasd
+ 1067  ./fluxve
+ 1068  ls
+ 1069  emacds fluxe.inp
+ 1070  emacs fluxe.inp
+ 1071  ./fluxve
+ 1072  ulimit -s unlimited
+ 1073  ./fluxve
+ 1074  ulimit -s unlimited
+ 1075  ./fluxve
+ 1076  ulimit -s unlimited
+ 1077  ./fluxve
+ 1078  ulimit -s unlimited
+ 1079  ./fluxve
+ 1080  emacs ~/programming/FluxV/src/main.c
+ 1081  ./fluxve
+ 1082  emacs fluxe.inp
+ 1083  ./fluxve
+ 1084  ls
+ 1085  emacs fort.1
+ 1086  ./fluxve
+ 1087  emacs fort.1 
+ 1088  ./fluxve
+ 1089  emacs fluxe.inp
+ 1090  ./fluxve
+ 1091  cd
+ 1092  cd jabref/
+ 1093  java -jar JabRef-2.10.jar 
+ 1094  cd /media/vinicius/VIN_BACKUP/Arrhenius/
+ 1095  ls
+ 1096  rsync -av 200.137.196.81>/home/vinicius/HHCl_NEWW/ HHCl_NEWW/
+ 1097  rsync -av 200.137.196.81:/home/vinicius/HHCl_NEWW/ HHCl_NEWW/
+ 1098  converter 0.5 ev fs
+ 1099  converter 1552.67 cm-1 ev
+ 1100  cd programming/FluxVE/
+ 1101  cd testd/
+ 1102  ./fluxve 
+ 1103  emac fort.1 
+ 1104  emacs fort.1 
+ 1105  ./fluxve 
+ 1106  ulimit -s unlimited
+ 1107  ./fluxve 
+ 1108  emacs fort.1 
+ 1109  rm fort.1 
+ 1110  ./fluxve 
+ 1111  ./fluxve > out
+ 1112  emacs out 
+ 1113  ./fluxve > out
+ 1114  emacs out 
+ 1115  ./fluxve > out
+ 1116  emacs out 
+ 1117  ./fluxve > out
+ 1118  emacs out 
+ 1119  ./fluxve > out
+ 1120  emacs out 
+ 1121  bg
+ 1122  ./fluxve 
+ 1123  ./fluxve > out
+ 1124  emacs out 
+ 1125  ./fluxve > out
+ 1126  ./fluxve 
+ 1127  ./fluxve | more
+ 1128  ./fluxve 
+ 1129  emacs fort.1 
+ 1130  ./fluxve 
+ 1131  emacs fort.1 
+ 1132  ./fluxve 
+ 1133  emacs fort.1 
+ 1134  bg
+ 1135  emacs ReIm_0001.dat 
+ 1136  ./fluxve 
+ 1137  emacs fort.1 
+ 1138  ./fluxve 
+ 1139  emacs fort.1 
+ 1140  ./fluxve 
+ 1141  emacs fort.1 
+ 1142  ./fluxve 
+ 1143  emacs fort.1 
+ 1144  ./fluxve 
+ 1145  emacs fort.1 
+ 1146  ./fluxve 
+ 1147  emacs fort.1 
+ 1148  ./fluxve 
+ 1149  emacs fort.1 
+ 1150  ./fluxve 
+ 1151  ./fluxve > out 
+ 1152  emacs out 
+ 1153  ./fluxve > out 
+ 1154  tail out 
+ 1155  ./fluxve 
+ 1156  emacs fort.1 
+ 1157  emacs fluxve 
+ 1158  emacs fluxe.inp
+ 1159  ./fluxve 
+ 1160  ./fluxve > out 
+ 1161  emacs out 
+ 1162  ./fluxve > out 
+ 1163  emacs out 
+ 1164  ./fluxve
+ 1165  emacs fluxe.inp
+ 1166  ./fluxve
+ 1167  emacs fort.1 
+ 1168  ./fluxve
+ 1169  emacs fort.1 
+ 1170  ./fluxve
+ 1171  emacs fort.1 
+ 1172  ./fluxve
+ 1173  emacs fort.1 
+ 1174  ./fluxve
+ 1175  emacs fort.1 
+ 1176  ./fluxve
+ 1177  ulimit -s unlimited
+ 1178  ./fluxve
+ 1179  ls
+ 1180  more check_spl000
+ 1181  more check_spl0001.dat 
+ 1182  ls
+ 1183  head check_spl0001.dat
+ 1184  head ReIm_0001.dat
+ 1185  gnuplot
+ 1186  ./fluxve 
+ 1187  ls
+ 1188  more check_spl0001.dat 
+ 1189  gnuplot 
+ 1190  ls
+ 1191  emacs fluxe.inp
+ 1192  ./fluxve 
+ 1193  gnuplot
+ 1194  loadifort 
+ 1195  make
+ 1196  nake
+ 1197  make
+ 1198  mak
+ 1199  make
+ 1200  mak
+ 1201  make
+ 1202  l
+ 1203  mae
+ 1204  make
+ 1205  emacs testd/check_spl0001.dat 
+ 1206  cp ../cross_deriv/hamiltonian/plot.c .
+ 1207  emacs plot.c 
+ 1208  ls
+ 1209  make
+ 1210  cd src/
+ 1211  emacs main.c &
+ 1212  emacs readallspl.f &
+ 1213  make
+ 1214  loadifort 
+ 1215  make
+ 1216  emacs readwholespl.f
+ 1217  more ../testd/ReIm_0001.dat 
+ 1218  make
+ 1219  mv ../plot.c .
+ 1220  emacs plot.c 
+ 1221  ls
+ 1222  gcc  -o plot plot.c -lm
+ 1223  ./plot 
+ 1224  ls
+ 1225  more plot_eig.out
+ 1226  emacs plot.c
+ 1227  bg
+ 1228  gcc  -o plot plot.c -lm
+ 1229  ./plot 
+ 1230  more plot_eig.out 
+ 1231  ls
+ 1232  gcc -o plot plot.c
+ 1233  ./plot 
+ 1234  cd programming/FluxVE/
+ 1235  ls
+ 1236  cd testd/
+ 1237  ./fluxve 
+ 1238  ls
+ 1239  emacs check_rea0001.dat&
+ 1240  ./fluxve 
+ 1241  ls
+ 1242  emacs check_rea0001.dat&
+ 1243  emacs check_spl0001.dat 
+ 1244  emacs ReIm_0001.dat 
+ 1245  emacs ReIm_0001.dat &
+ 1246  ./fluxve 
+ 1247  ls
+ 1248  emacs check_rea0001.dat
+ 1249  head check_rea0002.dat
+ 1250  ./fluxve 
+ 1251  ls
+ 1252  head check_spl0001.dat
+ 1253  head check_spl0002.dat
+ 1254  head check_spl0003.dat
+ 1255  make
+ 1256  ./fluxve 
+ 1257  ls
+ 1258  more check_spl0001.dat
+ 1259  head check_spl0002.dat
+ 1260  head check_spl0003.dat
+ 1261  ./fluxve 
+ 1262  loadifort 
+ 1263  make
+ 1264  make3
+ 1265  make
+ 1266  ls
+ 1267  make
+ 1268  emacs ../FluxV/src/main.c&
+ 1269  make
+ 1270  cd src/
+ 1271  emacs main.c &
+ 1272  emacs readallspl.f &
+ 1273  emacs splinesurf.f
+ 1274  cd sweden_jobs/Raman_CS2/spline/
+ 1275  ls
+ 1276  emacs spline2d.f
+ 1277  cd written/WFME_2014/
+ 1278  ls
+ 1279  emacs resumo.tex&
+ 1280  pdflatex resumo.tex 
+ 1281  evince resumo.pdf &
+ 1282  bg
+ 1283  emacs resumo.tex
+ 1284  bg
+ 1285  ls
+ 1286  evince phase.pdf
+ 1287  cd jabref/
+ 1288  java -jar JabRef-2.10.jar 
+ 1289  ssh arrhenius ssh arrhenius 
+ 1290  ssh arrhenius
+ 1291  ls
+ 1292  cd programming/
+ 1293  ls
+ 1294  mkdir HartreeFock
+ 1295  ls
+ 1296  cd HartreeFock/
+ 1297  ls
+ 1298  emacs main.c
+ 1299  bg
+ 1300  ls
+ 1301  emacs cgf.c &
+ 1302  emacs basis.h &
+ 1303  ls
+ 1304  gcc -c cgf.c
+ 1305  emacs basis.h
+ 1306  gcc -c cgf.c
+ 1307  cd testd/
+ 1308  ./fluxve 
+ 1309  emacs fluxe.inp
+ 1310  ./fluxve 
+ 1311  emacs fort.1 
+ 1312  ./fluxve 
+ 1313  ls
+ 1314  rm check_spl000*
+ 1315  ls
+ 1316  rm check_rea000*
+ 1317  ls
+ 1318  ./fluxve 
+ 1319  cd
+ 1320  cd programming/
+ 1321  ls
+ 1322  cd FluxVE/
+ 1323  ls
+ 1324  make
+ 1325  loadifort 
+ 1326  make
+ 1327  ls
+ 1328  make
+ 1329  cd src/
+ 1330  emacs main.c &
+ 1331  emacs readallspl.f &
+ 1332  emacs splinesurf.f&
+ 1333  ls
+ 1334  emacs mirror.c &
+ 1335  gnuplot
+ 1336  cd programming/FluxVE/
+ 1337  lsx
+ 1338  ls
+ 1339  cd testd/
+ 1340  ls
+ 1341  more check_rea0001.dat 
+ 1342  cd programming/
+ 1343  ls
+ 1344  cd FluxVE/test
+ 1345  cd FluxVE/testd
+ 1346  ls
+ 1347  gnuplot
+ 1348  converter 1 au fs
+ 1349  converter 1 fs au
+ 1350  ls
+ 1351  cd programming/FluxVE/test
+ 1352  cd written/
+ 1353  ls
+ 1354  cd 
+ 1355  cd programming/cross_deriv/
+ 1356  ls
+ 1357  emacs crossnum.tex
+ 1358  cd programming/
+ 1359  cd FluxVE/
+ 1360  ls
+ 1361  cd testd/
+ 1362  ./fluxve 
+ 1363  ls
+ 1364  rm "fort.1"
+ 1365  ./fluxve 
+ 1366  emacs fluxe.inp &
+ 1367  ./fluxve 
+ 1368  emacs debug.dat 
+ 1369  ./fluxve 
+ 1370  emacs ../../FluxV/src/main.c &
+ 1371  ./fluxve 
+ 1372  emacs debug.dat 
+ 1373  ls
+ 1374  head check_rea0001.dat
+ 1375  emacs fluxe.inp
+ 1376  ls
+ 1377  emacs fluxe.inp&
+ 1378  head ReIm_0005.dat
+ 1379  ./fluxve 
+ 1380  emacs debug.dat 
+ 1381  ./fluxve 
+ 1382  emacs debug.dat 
+ 1383  ./fluxve 
+ 1384  emacs debug.dat 
+ 1385  ./fluxve 
+ 1386  emacs debug.dat 
+ 1387  ./fluxve 
+ 1388  ls
+ 1389  emacs debug.dat 
+ 1390  ./fluxve 
+ 1391  emacs debug.dat 
+ 1392  ./fluxve 
+ 1393  emacs debug.dat 
+ 1394  ./fluxve 
+ 1395  xmgrace debug.dat 
+ 1396  rm debug.dat 
+ 1397  ./fluxve 
+ 1398  more debug.dat 
+ 1399  ls
+ 1400  emacs ../../FluxV/src/main.c
+ 1401  ./fluxve 
+ 1402  more debug.dat 
+ 1403  ./fluxve 
+ 1404  xmgrace debug.dat 
+ 1405  ./fluxve 
+ 1406  xmgrace debug.dat 
+ 1407  ./fluxve 
+ 1408  xmgrace debug.dat 
+ 1409  ./fluxve 
+ 1410  xmgrace debug.dat &
+ 1411  ./fluxve 
+ 1412  xmgrace debug.dat 
+ 1413  tail debug.dat 
+ 1414  head debug.dat 
+ 1415  ./fluxve 
+ 1416  xmgrace debug.dat 
+ 1417  tail debug.dat 
+ 1418  ./fluxve 
+ 1419  xmgrace debug.dat 
+ 1420  head debug.dat 
+ 1421  tail debug.dat 
+ 1422  ./fluxve 
+ 1423  tail debug.dat 
+ 1424  ./fluxve 
+ 1425  head debug.dat 
+ 1426  tail debug.dat 
+ 1427  ./fluxve 
+ 1428  head debug.dat 
+ 1429  tail debug.dat 
+ 1430  xmgrace debug.dat 
+ 1431  tail debug.dat 
+ 1432  ./fluxve 
+ 1433  xmgrace debug.dat 
+ 1434  ./fluxve 
+ 1435  xmgrace debug.dat 
+ 1436  ./fluxve 
+ 1437  xmgrace debug.dat 
+ 1438  ls
+ 1439  history > hist
+ 1440  emacs hist 
+ 1441  rm hist 
+ 1442  ./fluxve 
+ 1443  xmgrace debug.dat 
+ 1444  ./fluxve 
+ 1445  xmgrace debug.dat 
+ 1446  ./fluxve 
+ 1447  xmgrace debug.dat 
+ 1448  ./fluxve 
+ 1449  xmgrace debug.dat 
+ 1450  ./fluxve 
+ 1451  xmgrace debug.dat 
+ 1452  ./fluxve 
+ 1453  xmgrace debug.dat 
+ 1454  ./fluxve 
+ 1455  xmgrace debug.dat 
+ 1456  ./fluxve 
+ 1457  xmgrace debug.dat 
+ 1458  ./fluxve 
+ 1459  xmgrace debug.dat 
+ 1460  ./fluxve 
+ 1461  xmgrace debug.dat 
+ 1462  cp debug.dat debug.datold
+ 1463  ./fluxve 
+ 1464  xmgrace debug.dat
+ 1465  ls
+ 1466  make
+ 1467  loadifort 
+ 1468  make
+ 1469  emacs makefile &
+ 1470  make
+ 1471  emacs makefile
+ 1472  make
+ 1473  ls
+ 1474  emacs makefile
+ 1475  make
+ 1476  emacs makefile&
+ 1477  make
+ 1478  make clean 
+ 1479  make
+ 1480  ls
+ 1481  make
+ 1482  ls
+ 1483  make
+ 1484  mak3
+ 1485  make
+ 1486  cd src/
+ 1487  ls
+ 1488  emacs main.c &
+ 1489  ls
+ 1490  mv mirror.c fourrier.c
+ 1491  emacs fourrier.c &
+ 1492  emacs readallspl.f
+ 1493  mv fourrier.c fourier.c
+ 1494  cp fourier.c fourier.h
+ 1495  emacs fourier.h&
+ 1496  emacs fourier.c &
+ 1497  emacs fourier.h&
+ 1498  btg
+ 1499  emacs splinesurf.h
+ 1500  emacs fourier.h
+ 1501  emacs splinesurf.h
+ 1502  ls
+ 1503  emacs fourier.h&
+ 1504  gcc -c -lfftw3 fourier.f
+ 1505  gcc -c -lfftw3 fourier.c 
+ 1506  gcc -c -lfftw fourier.c 
+ 1507  gcc -c -lfftw fourier.c -lm
+ 1508  gcc -c -lfftw3 fourier.c -lm
+ 1509  gcc -c -lfftw3 -lm fourier.c
+ 1510  gcc -c fourier.c -lfftw3 -lm
+ 1511  make
+ 1512  cd programming/
+ 1513  ls
+ 1514  cd fftw_learn/
+ 1515  ls
+ 1516  emacs test.c
+ 1517  emacs run_fftw.c
+ 1518  emacs example.c
+ 1519  cd eSPec_v0.
+ 1520  cd eSPec_v0.7/src/
+ 1521  ls
+ 1522  emacs spectrum.f 
+ 1523  cd programming/fftw_learn/
+ 1524  ls
+ 1525  gcc -o mytest example.c
+ 1526  gcc -o mytest example.c -lfftw3 -lm
+ 1527  ./mytest 
+ 1528  ls
+ 1529  emacs example.c &
+ 1530  xmgrace -nxy initial.dat 
+ 1531  xmgrace -nxy final.dat 
+ 1532  tail initial.dat 
+ 1533  xmgrace initial.dat 
+ 1534  xmgrace -nxy final.dat 
+ 1535  cd programming/FluxVE/testd/
+ 1536  ./fluxve 
+ 1537  xmgrace debug.dat
+ 1538  ./fluxve 
+ 1539  ls
+ 1540  xmgrace initial.dat 
+ 1541  ./fluxve 
+ 1542  xmgrace debug.dat
+ 1543  xmgrace initial.dat 
+ 1544  tail debug.dat
+ 1545  emacs debug.dat
+ 1546  xmgrace debug.dat
+ 1547  ./fluxve 
+ 1548  xmgrace debug.dat
+ 1549  ./fluxve 
+ 1550  xmgrace debug.dat
+ 1551  ./fluxve 
+ 1552  xmgrace debug.dat
+ 1553  ./fluxve 
+ 1554  xmgrace debug.dat
+ 1555  ./fluxve 
+ 1556  xmgrace debug.dat
+ 1557  ./fluxve 
+ 1558  xmgrace debug.dat
+ 1559  ./fluxve 
+ 1560  xmgrace debug.dat
+ 1561  cd programming/FluxVE/
+ 1562  make
+ 1563  loadifort 
+ 1564  mae
+ 1565  make
+ 1566  mK
+ 1567  make
+ 1568  cd programming/FluxVE/src/
+ 1569  emacs main.c &
+ 1570  emacs fourier.c &
+ 1571  emacs fourier.h 
+ 1572  gnuplot
+ 1573  converter 400 cm-1 to au
+ 1574  converter 400 cm-1  au
+ 1575  converter 400 cm-1  ev
+ 1576  converter 400 cm-1  au
+ 1577  converter 1 au angs
+ 1578  converter 1 angs au
+ 1579  gnuplot
+ 1580  cd sweden_jobs/Raman_CS2/
+ 1581  ls
+ 1582  cd rovib
+ 1583  ls
+ 1584  emacs testouty
+ 1585  emacs testouty&
+ 1586  bc -l
+ 1587  gnuplot
+ 1588  ls
+ 1589  emacs testouty5
+ 1590  bg
+ 1591  ls
+ 1592  more potgs.dat
+ 1593  emacs potgs.dat 
+ 1594  converter 1552.67 cm-1 au
+ 1595  converter 406.06 cm-1 au
+ 1596  bc -l
+ 1597  mkdir wavepacket_program_CPC
+ 1598  ls
+ 1599  cd wavepacket_program_CPC/
+ 1600  ls
+ 1601  mv ~/Downloads/aeqw_v1_0.tar.gz .
+ 1602  ls
+ 1603  descomp aeqw_v1_0.tar.gz 
+ 1604  ls
+ 1605  cd wavepacket/
+ 1606  ls
+ 1607  emacs wavepacket.c
+ 1608  ls
+ 1609  emacs README.TXT 
+ 1610  cd jabref/
+ 1611  java -jar JabRef-2.10.jar 
+ 1612  cd eSPec_v0.7/
+ 1613  ls
+ 1614  cd src/
+ 1615  ls
+ 1616  grep 'SG' *
+ 1617  emacs emacs spectrumtd.f
+ 1618  emacs spectrumtd.f
+ 1619  ./fluxve 
+ 1620  xmgrace debug.dat
+ 1621  ./fluxve 
+ 1622  xmgrace debug.dat
+ 1623  ./fluxve 
+ 1624  xmgrace debug.dat
+ 1625  ./fluxve 
+ 1626  xmgrace initial.dat 
+ 1627  ./fluxve 
+ 1628  xmgrace initial.dat 
+ 1629  xmgrace final.dat 
+ 1630  ./fluxve 
+ 1631  xmgrace back_transform.dat 
+ 1632  xmgrace initial.dat 
+ 1633  ./fluxve 
+ 1634  xmgrace final.dat 
+ 1635  ./fluxve 
+ 1636  xmgrace final.dat 
+ 1637  ./fluxve 
+ 1638  xmgrace final.dat 
+ 1639  xmgrace back_transform.dat 
+ 1640  ./fluxve 
+ 1641  xmgrace back_transform.dat 
+ 1642  ./fluxve 
+ 1643  xmgrace back_transform.dat 
+ 1644  more back_transform.dat 
+ 1645  xmgrace final.dat ~/programming/fftw_learn/final.dat 
+ 1646  ./fluxve 
+ 1647  xmgrace final.dat 
+ 1648  ./fluxve 
+ 1649  xmgrace final.dat 
+ 1650  ./fluxve 
+ 1651  xmgrace final.dat 
+ 1652  more final.dat 
+ 1653  emacs final.dat 
+ 1654  ./fluxve 
+ 1655  xmgrace final.dat 
+ 1656  ./fluxve 
+ 1657  xmgrace final.dat 
+ 1658  xmgrace initial.dat 
+ 1659  ./fluxve 
+ 1660  xmgrace initial.dat 
+ 1661  xmgrace final.dat 
+ 1662  ./fluxve 
+ 1663  xmgrace final.dat 
+ 1664  ./fluxve 
+ 1665  xmgrace final.dat 
+ 1666  ./fluxve 
+ 1667  xmgrace final.dat 
+ 1668  ./fluxve 
+ 1669  xmgrace window.dat 
+ 1670  ./fluxve 
+ 1671  xmgrace window.dat 
+ 1672  xmgrace final.dat 
+ 1673  xmgrace initial.dat 
+ 1674  ./fluxve 
+ 1675  xmgrace initial.dat 
+ 1676  xmgrace final.dat 
+ 1677  make
+ 1678  ./fluxve 
+ 1679  xmgrace final.dat 
+ 1680  ./fluxve 
+ 1681  xmgrace final.dat 
+ 1682  xmgrace window.dat 
+ 1683  ./fluxve 
+ 1684  ls
+ 1685  xmgrace final.dat
+ 1686  ./fluxve 
+ 1687  make
+ 1688  ./fluxve 
+ 1689  xmgrace final.dat
+ 1690  ./fluxve 
+ 1691  xmgrace final.dat
+ 1692  ./fluxve 
+ 1693  xmgrace final.dat
+ 1694  ./fluxve 
+ 1695  xmgrace final.dat
+ 1696  xmgrace initial.dat 
+ 1697  ./fluxve 
+ 1698  xmgrace initial.dat 
+ 1699  xmgrace final.dat
+ 1700  ./fluxve 
+ 1701  xmgrace final.dat
+ 1702  head final.dat 
+ 1703  tail final.dat 
+ 1704  head initial.dat 
+ 1705  tail initial.dat 
+ 1706  lsd
+ 1707  ls
+ 1708  xmgrace back_transform.dat 
+ 1709  ./fluxve 
+ 1710  xmgrace initial.dat 
+ 1711  ./fluxve 
+ 1712  xmgrace final.dat 
+ 1713  xmgrace window.dat 
+ 1714  xmgrace initial.dat 
+ 1715  ./fluxve 
+ 1716  xmgrace final.dat 
+ 1717  xmgrace window.dat initial.dat 
+ 1718  ./fluxve 
+ 1719  ls
+ 1720  xmgrace final.dat 
+ 1721  xmgrace initial.dat 
+ 1722  ./fluxve 
+ 1723  xmgrace final.dat 
+ 1724  ./fluxve 
+ 1725  xmgrace final.dat 
+ 1726  ./fluxve 
+ 1727  xmgrace final.dat 
+ 1728  ./fluxve 
+ 1729  xmgrace final.dat 
+ 1730  make
+ 1731  loadifort 
+ 1732  make
+ 1733  emacs fourier.c&
+ 1734  emacs fourier.c
+ 1735  emac example.c &
+ 1736  emacs example.c &
+ 1737  gnuplot
+ 1738  ./fluxve 
+ 1739  xmgrace final.dat 
+ 1740  xmgrace initial.dat 
+ 1741  xmgrace window.dat 
+ 1742  ./fluxve 
+ 1743  xmgrace initial.dat 
+ 1744  ./fluxve 
+ 1745  xmgrace initial.dat 
+ 1746  ./fluxve 
+ 1747  xmgrace initial.dat 
+ 1748  xmgrace window.dat 
+ 1749  rm window.dat 
+ 1750  rm initial.dat 
+ 1751  ./fluxve 
+ 1752  xmgrace initial.dat 
+ 1753  xmgrace window.dat 
+ 1754  ./fluxve 
+ 1755  xmgrace window.dat 
+ 1756  xmgrace final.dat 
+ 1757  xmgrace initial.dat 
+ 1758  ./fluxve 
+ 1759  xmgrace initial.dat 
+ 1760  xmgrace final.dat 
+ 1761  ./fluxve 
+ 1762  xmgrace initial.dat 
+ 1763  xmgrace final.dat 
+ 1764  ./fluxve 
+ 1765  xmgrace final.dat 
+ 1766  ./fluxve 
+ 1767  xmgrace final.dat 
+ 1768  ./fluxve 
+ 1769  xmgrace final.dat 
+ 1770  ./fluxve 
+ 1771  xmgrace final.dat 
+ 1772  ./fluxve 
+ 1773  xmgrace final.dat 
+ 1774  ./fluxve 
+ 1775  xmgrace final.dat 
+ 1776  xmgrace initial.dat final.dat 
+ 1777  ./fluxve 
+ 1778  xmgrace final.dat 
+ 1779  xmgrace back_transform.dat 
+ 1780  ./fluxve 
+ 1781  xmgrace back_transform.dat 
+ 1782  ./fluxve 
+ 1783  xmgrace back_transform.dat 
+ 1784  ./fluxve 
+ 1785  xmgrace back_transform.dat 
+ 1786  xmgrace back_transform.dat initial.dat 
+ 1787  xmgrace final.dat 
+ 1788  xmgrace initial.dat final.dat 
+ 1789  ./fluxve 
+ 1790  xmgrace final.dat 
+ 1791  ./fluxve 
+ 1792  xmgrace final.dat 
+ 1793  ./fluxve 
+ 1794  xmgrace final.dat 
+ 1795  ./fluxve 
+ 1796  xmgrace final.dat 
+ 1797  ./fluxve 
+ 1798  loadifort 
+ 1799  make
+ 1800  make clean 
+ 1801  make
+ 1802  ls
+ 1803  make
+ 1804  emacs readallspl.f 
+ 1805  emacs fourier.h &
+ 1806  ls
+ 1807  cd programming/
+ 1808  ls
+ 1809  cd
+ 1810  ls
+ 1811  cd sweden_jobs/
+ 1812  ls
+ 1813  cd Raman_CS2/
+ 1814  ls
+ 1815  cd spline/
+ 1816  ls
+ 1817  emacs xixfspl.f
+ 1818  bg
+ 1819  emacs spline.f
+ 1820  ls
+ 1821  cd ..
+ 1822  ls
+ 1823  cp -r spline/ /media/vinicius/Eric/
+ 1824  ssh arrhenius
+ 1825  ssh arrhenius 
+ 1826  ping google.com
+ 1827  cd programming/FluxVE/
+ 1828  ls
+ 1829  cd testd/
+ 1830  ls
+ 1831  ./fluxve 
+ 1832  make
+ 1833  loadifort 
+ 1834  make
+ 1835  cd src/
+ 1836  emacs main.c &
+ 1837  emacs fourier.c&
+ 1838  ssh arrhenius
+ 1839  ssh arrhenius 
+ 1840  cd programming/FluxV
+ 1841  ls
+ 1842  ssh arrhenius
+ 1843  cd programming/
+ 1844  cd test
+ 1845  ls
+ 1846  mkdir random_tests
+ 1847  cd random_tests/
+ 1848  ls
+ 1849  emacs 2dmat.c &
+ 1850  ls
+ 1851  gcc -o 3dmat 2dmat.c
+ 1852  make
+ 1853  gcc -o 3dmat 2dmat.c
+ 1854  ./3dmat 
+ 1855  ./3dmat > out
+ 1856  emacs out &
+ 1857  gcc -o 3dmat 2dmat.c
+ 1858  ./3dmat > out
+ 1859  emacs out 
+ 1860  cd programming/FluxVE/
+ 1861  cd test
+ 1862  cd testd/
+ 1863  ls
+ 1864  ./fluxve 
+ 1865  ls
+ 1866  emacs fluxe.inp
+ 1867  ./fluxve 
+ 1868  make
+ 1869  ./fluxve 
+ 1870  make
+ 1871  loadifort 
+ 1872  make
+ 1873  make clean 
+ 1874  make
+ 1875  make clean 
+ 1876  make
+ 1877  ulimit -s unlimited
+ 1878  make
+ 1879  cd src/
+ 1880  ls
+ 1881  emacs main.c &
+ 1882  ls
+ 1883  emacs Jflux.c&
+ 1884  ls
+ 1885  emacs readallspl.f&
+ 1886  ls
+ 1887  emacs fourier.c&
+ 1888  emacs fourier.h&
+ 1889  bg
+ 1890  ls
+ 1891  emacs rdinput.c &
+ 1892  emacs splinesurf.h 
+ 1893  emacs splinesurf.f &
+ 1894  emacs splinesurf.f 
+ 1895  gnuplot
+ 1896  emacs momentum.dat 
+ 1897  rm momentum.dat 
+ 1898  cd programming/random_tests/
+ 1899  ls
+ 1900  emacs simpson_int.c
+ 1901  bg
+ 1902  gcc -o int simpson_int.cp
+ 1903  gcc -o int simpson_int.c
+ 1904  gcc -o int simpson_int.c -lm
+ 1905  make
+ 1906  gcc -o int simpson_int.c -lm
+ 1907  ./int 
+ 1908  gcc -o int simpson_int.c -lm
+ 1909  ./int 
+ 1910  gcc -o int simpson_int.c -lm
+ 1911  ./int 
+ 1912  gcc -o int simpson_int.c -lm
+ 1913  ./int 
+ 1914  gcc -o int simpson_int.c -lm
+ 1915  ./int 
+ 1916  gcc -o int simpson_int.c -lm
+ 1917  ./int 
+ 1918  gcc -o int simpson_int.c -lm
+ 1919  ./int 
+ 1920  gcc -o int simpson_int.c -lm
+ 1921  ./int 
+ 1922  gcc -o int simpson_int.c -lm
+ 1923  ./int 
+ 1924  gcc -o int simpson_int.c -lm
+ 1925  ./int 
+ 1926  gcc -o int simpson_int.c -lm
+ 1927  ./int 
+ 1928  gcc -o int simpson_int.c -lm
+ 1929  ./int 
+ 1930  gcc -o int simpson_int.c -lm
+ 1931  ./int 
+ 1932  gcc -o int simpson_int.c -lm
+ 1933  ./int 
+ 1934  gcc -o int simpson_int.c -lm
+ 1935  ./int 
+ 1936  make
+ 1937  ./int 
+ 1938  gcc -o int simpson_int.c -lm
+ 1939  ./int 
+ 1940  cd eSPec_v0.7/
+ 1941  ls
+ 1942  ./espec.x 
+ 1943  bc -l
+ 1944  fg
+ 1945  emacs programming/FluxV/src/main.c &
+ 1946  cd programming/FluxVE/
+ 1947  ls
+ 1948  cd testd/artificial_test/
+ 1949  ls
+ 1950  emacs outr &
+ 1951  xmgrace fft_check_out.dat 
+ 1952  xmgrace -nxy fft_check_out.dat 
+ 1953  xmgrace -nxy fft_check_out.dat
+ 1954  xmgrace -nxy fft_check_in.dat
+ 1955  ./fluxve > outr &
+ 1956  tail -f outr
+ 1957  xmgrace fft_check_out.dat 
+ 1958  xmgrace -nxy fft_check_out.dat 
+ 1959  mgrace fft_check_in.dat 
+ 1960  xmgrace fft_check_in.dat 
+ 1961  ls
+ 1962  make
+ 1963  loadifort 
+ 1964  make
+ 1965  cd src/
+ 1966  emacs main.c &
+ 1967  emacs fourier.c&
+ 1968  gnuplot
+ 1969  converter 1217.710 au fs
+ 1970  converter 3.14 ev au
+ 1971  gnuplo
+ 1972  gnuplot
+ 1973  bc -l
+ 1974  sudo apt-get install git
+ 1975  l
+ 1976  ls
+ 1977  cd eSPec_v0.7/
+ 1978  s
+ 1979  ls
+ 1980  cd src/
+ 1981  ls
+ 1982  ls *.f
+ 1983  emacs soma.f
+ 1984  grep -i 'split'
+ 1985  grep -i 'split' *
+ 1986  grep -i 'so' *
+ 1987  ls
+ 1988  emacs au.f
+ 1989  emacs rdinput.f
+ 1990  bg
+ 1991  grep -i '.PFSPO' *
+ 1992  emacs espec.f
+ 1993  bg
+ 1994  emacs pspofft.f &
+ 1995  bg
+ 1996  grep 'PSPOFFTAUX' *
+ 1997  emacs spowlet.f
+ 1998  cd eSPec_v0.7/src/
+ 1999  emacs init_cond.f
+ 2000  bg
+ 2001  emacs espec.f &
+ 2002  bg
+ 2003  emacs gauss.f &
+ 2004  ls
+ 2005  history
+ 2006  history > klaspdajf
