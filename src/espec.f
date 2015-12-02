@@ -48,8 +48,14 @@ c     ** Scalar arguments
       INTEGER       NT, NREORT, NSHOT, NPR, MAXINT, KP, KL, KLX, ISC
       REAL*8        ABSTOL, CS, DE, DT, DTF, T, TI, TF, TOL, SC, WP
       REAL*8        FATE, FATL, FATT, E0, T0, TD, TP, OMG, SNI, E1I
-      REAL*8        CHWHM, ALPHA, ADE, RABI, XM, XMIN, XMINB
+      REAL*8        CHWHM, ALPHA, ADE, RABI, XM, XMIN, XMINB,XMINC      
       REAL*8        GAMMA, OMEGA, DMX, T0X, TPX, AA, QC, DELQ
+c
+c     strong field variables
+      INTEGER KL3(3)
+      REAL*8 VMIN,VMINB,VMINC,GAMMA3(3),TDIPOL(3)
+      REAL*8 E03(3),TP3(3),OMG3(3),T03(3),SNI3(3),TD3(3)
+      
 c     ** 
 c     ** Parameters 
       INCLUDE "param.f" !This file contain the parameters used by the main program, 
@@ -229,7 +235,8 @@ c     .. Getting input parameters
      &     NP, ABSTOL, DT, DTF, TI, TF, TOL, WP, E0, TP, TD, T0, SNI, 
      &     OMG, CHWHM, DE, E1I, ADE, GAMMA, OMEGA, DMX, TPX, T0X, AA, 
      &     QC, DELQ, CSTI, CSTF, CSTFB, CSTDM, SM, SMF, XI, XF, AL, AR,
-     &     rK, rA, X0, VOI, VAR,SHF,PRTREGION,NREG,RANGE,PRTONLYREIM)
+     &     rK, rA, X0, VOI, VAR,SHF,PRTREGION,NREG,RANGE,PRTONLYREIM,
+     &     GAMMA3,TDIPOL,OMG3,E03,TP3,TD3,T03,SNI3,KL3)
 C,PRTABS)
       WRITE(*,*)'Input parameters got.'
 c
@@ -647,7 +654,7 @@ c            SH(I) = SH(I)/A0A
       ENDIF
 c     ..
       IF(ABSORB)THEN
-         WRITE(*,*)'Absorbing bondary conditions:'
+         WRITE(*,*)'Absorbing boundary conditions:'
          IF(POTCH(1:5).EQ.'.FILE' .OR. POTCHF(1:5).EQ.'.FILE'
      &        .OR. TPABSOR(1:11).EQ.'.SMOOTHW_au' .OR.
      &        TPABSOR(1:11).EQ.'.SMRS_au' .OR. 
@@ -966,6 +973,16 @@ c
             WRITE(*,1003)'   Getting final potential B...' 
             CALL RDPTE(POTFILEF, NT, ND, XI, XF, XMINB, VPOT(NT+1))
             WRITE(*,*)'Final potential B got.'
+         ELSE IF(TPPROPG(1:8).EQ.'.COUPLE3')THEN
+c----------strong field
+            WRITE(*,1003)'   Getting final potential B...'
+            CALL RDPTM(SHIFTP,POTFILEF,NT,ND,XI,XF,VMINB,VPOT(NT+1))
+            WRITE(*,*)'Intermediate potential A got.'
+c     
+            WRITE(*,1003)'   Getting final potential C...' 
+            CALL RDPTM(SHIFTP,POTFILEF,NT,ND,XI,XF,VMINC,VPOT(2*NT+1))
+            WRITE(*,*)'Final potential C got.'
+
          ELSE
             WRITE(*,1003)'   Getting final potential...'
             CALL RDPT(SHIFTP, POTFILEF, NT, ND, XI, XF, XMIN, VPOT(1))
@@ -1528,6 +1545,18 @@ c     &               WV,  WP, WORK, LNZVC)
                   WRITE(*,*)'INFO =',INFO
                   IF(FSTOP) STOP
                ENDIF
+c-------------------
+c     strong field interaction
+            ELSEIF(TPPROPG(1:8).EQ.'.COUPLE3')THEN
+
+               WRITE(*,*)
+               WRITE(*,*)'Propagation on 3 PES coupled by strong  
+     &fields will be performed!'
+               print*,'ti, tf',TI,TF
+               CALL coupled3(DIM,ND,NT,NP,XP,XI,SH,SHM,U1,V1,VPOT,VMINB,
+     &              VMINC,gamma3,TDIPOL,OMG3,E03,TP3,TD3,T03,SNI3,
+     &              KL3,TI,TF,DT,NSHOT,MXDCT)
+
             ELSE
                NC = ICHLENGTH(TPPROPG,0)
                WRITE(*,*)'<<<>>> Propagator',TPPROPG(1:NC),

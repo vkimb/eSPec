@@ -10,7 +10,10 @@ PROG = espec_v$(VERSION).x
 #   FFLAGS = -O3 -i4 -ident -Wall -static -malign-double
 #   FFLAGS = -O3 -Wall -static -march=native -ffloat-store -ffixed-line-length-none -fd-lines-as-comments
 #   FFLAGS = -fast -traceback
-FFlAGS = -traceback -mcmodel large 
+LIBRARIES=/opt/sundials/lib
+INCLUDE=/opt/sundials/include
+LDFLAGS=-L${LIBRARIES} -lsundials_fcvode -lsundials_fnvecserial -lsundials_cvode -lsundials_nvecserial -I${INCLUDE} -Wl,-rpath=${LIBRARIES}
+FFlAGS = -traceback -mcmodel large -check all -check noarg_temp_created -g
 # ifort flags: 
 # -fast     enable -xHOST -O3 -ipo -no-prec-div -static options set by -fast cannot be overridden with the exception of -xHOST, list options separately to change behavior
 # -xSSE3 (CORE(tm)2 processors)
@@ -18,7 +21,11 @@ FFlAGS = -traceback -mcmodel large
 #  -traceback for debugs
 #
 #-static
-   FC = ifort
+
+#  DEBUG
+   FC = ifort -g -traceback -check all -O0 -heap-arrays
+#  OPTIMIZE
+#FC = ifort -O3 -heap-arrays
 #   FC = gfortran
 # Digital 
 #   FFLAGS = -O0 -i4 -ident -o $@ 
@@ -57,7 +64,8 @@ ESPEC_OBJS = src/rdinput.o src/compar.o src/chlength.o src/rdpt.o \
 	src/dvtn.o src/spofft.o src/pspofft.o src/dkeft.o src/eigenergfft.o \
 	src/eigenergfft1.o src/absorb.o src/s2ppsod.o src/abm1.o \
 	src/s2ppabm.o src/sod1.o src/s2ppabm2.o src/init_cond.o src/gauss.o \
-	src/ap1d.o src/ap2d.o src/ap2dct.o src/au2dct.o 
+	src/ap1d.o src/ap2d.o src/ap2dct.o src/au2dct.o src/coupled3.o src/rdpt-min.o\
+	src/righthands.o 
 #
 XESPEC_OBJS =	
 #
@@ -113,10 +121,19 @@ espec:  $(OBJS)
 	make blas
 	make ffts
 	make lapack
-	$(FC) $(FFLAGS) -o $(PROG) $(OBJS) $(BLAS_OBJS) $(LAPACK_OBJS) $(FFTS_OBJS) -static
+	$(FC) $(FFLAGS) -o $(PROG) $(OBJS) $(BLAS_OBJS) $(LAPACK_OBJS) $(FFTS_OBJS) $(LDFLAGS) -static
 	size $(PROG)
 	ln -sf $(PROG) espec.x
 	chmod a+xr $(PROG) espec.x
+#
+src/coupled3.o: src/coupled3.f90
+	$(FC) $(FFLAGS) -c src/coupled3.f90
+	mv coupled3.o src/
+#
+src/righthands.o: src/righthands.f90
+	$(FC) $(FFLAGS) -c src/righthands.f90
+	mv righthands.o src/
+	cp rhside.mod src/
 #
 normf:  src/normfs.o src/ecnorm.o src/spline.o src/chlength.o $(BLAS_OBJS)
 	make ffts
@@ -145,7 +162,7 @@ fluxp:  src/flux.o src/splinem2.o src/rdpt2.o src/mtrxdiag.o src/prteigvc.o \
 		src/chlength.o src/mtrxdiag.o src/prteigvc.o $(BLAS_OBJS) \
 		$(LAPACK_OBJS)
 	size fluxp.x
-	chmod a+xr fluxp.x
+	chmod a+xr fluxp.x	
 #
 blas:   $(BLAS_OBJS)
 #

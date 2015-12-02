@@ -72,10 +72,18 @@ c         read(*,*)
          TPA = TP/(0.693147181**A1)
          EF = FAT*SQRT(E0*EXP(-((T - T0)/TPA)**(TWO*KL)))
      &        *COS(OMG*T*FATT + SNI)
+      ELSEIF(EFC(1:5).EQ.'.ENVG')THEN
+c      write(*,*)'T,E0,OMG,T0,TP,KL',T,E0,OMG,T0,TP,KL
+c      read(*,*)
+         A1 = ONE/(TWO*KL)
+         TPA = TP/(0.693147181**A1)
+         EF = FAT*SQRT(E0*EXP(-((T - T0)/TPA)**(TWO*KL))) 
+c         write(*,*) T,EF
+c         read(*,*)
       ELSEIF(EFC(1:5).EQ.'.SIN2')THEN
          EF = E0*COS(PI*(T - TD)/TP)*COS(PI*(T - TD)/TP)
      &        *COS(OMG*(T - TD)*FATT + SNI)
-         EF = EF*FATE ! V/cm = J/(C*cm) -> a.u./(D)
+         EF = EF*FATE           ! V/cm = J/(C*cm) -> a.u./(D)
       ELSEIF(EFC(1:5).EQ.'.NONE' .OR. EFC(1:5).EQ.'.NULL')THEN
          EF = ZERO
       ELSE

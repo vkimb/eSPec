@@ -8,7 +8,8 @@
      &     NP, ABSTOL, DT, DTF, TI, TF, TOL, WP, E0, TP, TD, T0, SNI, 
      &     OMG, CHWHM, DE, E1I, ADE, GAMMA, OMEGA, DMX, TPX, T0X, AA,
      &     QC, DELQ, CSTI, CSTF, CSTFB, CSTDM, SM, SMF, XI, XF, AL, AR,
-     &     rK, rA, X0, VOI, VAR,SHF,PRTREGION,NREG,RANGE,PRTONLYREIM)
+     &     rK, rA, X0, VOI, VAR,SHF,PRTREGION,NREG,RANGE,PRTONLYREIM,
+     &     GAMMA3,TDIPOL,OMG3,E03,TP3,TD3,T03,SNI3,KL3)
       IMPLICIT NONE
 c     **
 c     ** Scalar arguments
@@ -26,6 +27,10 @@ c     ** Scalar arguments
       REAL*8        SNI, OMG, CHWHM, DE, E1I, ADE
       REAL*8        GAMMA, OMEGA, DMX, TPX, T0X, AA, QC, DELQ
 c     **
+c     strong field variables
+      INTEGER KL3(3)
+      REAL*8 VMIN,VMINB,VMINC,GAMMA3(3),TDIPOL(3)
+      REAL*8 E03(3),TP3(3),OMG3(3),T03(3),SNI3(3),SKL3(3),TD3(3)
 c     ** Array arguments
 cdel      LOGICAL
       INTEGER       NP(*)
@@ -501,7 +506,30 @@ c                  DMX   = DMX/FATEEVAU
      &te, frequency, pulse parameters and transition dipole moment! <<<>
      &>>'
                   IF(FSTOP) STOP
-               ENDIF  
+               ENDIF 
+            ELSEIF(TPPROPG(1:8).EQ.'.COUPLE3')THEN
+c---- strong field
+               READ(1,*,END=999,ERR=999)TI, TF, DT
+ 42            READ(1,'(A)',END=999,ERR=999)READAUX
+               print*,READAUX
+               IF(READAUX(1:1).EQ.'*')GOTO 310
+
+               IF(READAUX(1:7).EQ.'.DECAYS')THEN
+                  READ(1,*,END=999,ERR=999)GAMMA3(1),GAMMA3(2),GAMMA3(3)
+                  write(*,*)  GAMMA3(1),GAMMA3(2),GAMMA3(3)
+                  GOTO 42 
+               ELSEIF(READAUX(1:7).EQ.'.PULSES')THEN
+                  READ(1,*,END=999,ERR=999)E03(1),TP3(1),OMG3(1),T03(1),
+     &                 SNI3(1),SKL3(1)
+                  READ(1,*,END=999,ERR=999)E03(2),TP3(2),OMG3(2),T03(2),
+     &                 SNI3(2),SKL3(2)
+                  KL3(1) = SKL3(1)
+                  KL3(2) = SKL3(2)
+                  GOTO 42
+               ELSEIF(READAUX(1:7).EQ.'.TDIPOL')THEN
+                  READ(1,*,END=999,ERR=999) TDIPOL(1),TDIPOL(2)
+                  GOTO 42
+               ENDIF
             ELSE
                WRITE(*,1001)
                WRITE(*,1002)TPPROPG
