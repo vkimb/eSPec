@@ -23,7 +23,7 @@ FFlAGS = -traceback -mcmodel large -check all -check noarg_temp_created -g
 #-static
 
 #  DEBUG
-   FC = ifort -g -traceback -check all -O0 -heap-arrays
+   FC = ifort -g -traceback -check all -O0 -heap-arrays -mkl
 #  OPTIMIZE
 #FC = ifort -O3 -heap-arrays
 #   FC = gfortran
