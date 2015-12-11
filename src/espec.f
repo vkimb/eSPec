@@ -27,6 +27,8 @@ c     **
 *     (30/06/2003) Inclusion of pulse control by Freddy.
 *     (-/09/2014) Some bugs fixed in version 07 by Vinicius and Freddy
 *     and inclusion of cross term hamiltonian
+*     (-/11-12/2015) Inclusion of the solution of propagation on 3 PES coupled by 
+*     strong laser fields by Vinicius and Andrey
 * 
 c     **
 c     ** Scalar arguments
@@ -44,6 +46,7 @@ c     ** Scalar arguments
       CHARACTER*25  POTFILE, POTFILEF, FILEAUX, DMFILE, POTCH, POTCHF
       CHARACTER*172 TITLE
       INTEGER       I, IIL, IIU, IFL, IFU, INFO, J, K, MC, NDAUX,NREG
+      INTEGER       INFOB,INFOC
       INTEGER       MF, MP, MPR, MPI, NC, NFS, NSEED, NIS, ND, NDT
       INTEGER       NT, NREORT, NSHOT, NPR, MAXINT, KP, KL, KLX, ISC
       REAL*8        ABSTOL, CS, DE, DT, DTF, T, TI, TF, TOL, SC, WP
@@ -52,7 +55,7 @@ c     ** Scalar arguments
       REAL*8        GAMMA, OMEGA, DMX, T0X, TPX, AA, QC, DELQ
 c
 c     strong field variables
-      INTEGER KL3(3)
+      INTEGER KL3(3),NSTATES
       REAL*8 VMIN,VMINB,VMINC,GAMMA3(3),TDIPOL(3)
       REAL*8 E03(3),TP3(3),OMG3(3),T03(3),SNI3(3),TD3(3)
       
@@ -80,12 +83,14 @@ c     ** Array arguments
       INTEGER       IWK(MXDCT),  NP(MXDM)
       REAL*8        CSTI(MXCST), CSTF(MXCST), CSTFB(MXCST), CSTDM(MXCST)  
       REAL*8        EIGVL(LMTREORT), PL(MXDM), SH(MXDM), SHM(MXDM)
+      REAL*8        EIGVL_B(LMTREORT),EIGVL_C(LMTREORT)
       REAL*8        SM(MXDM), SMF(MXDM), SHF(MXDM),U1(MXDCT), V1(MXDCT)
       REAL*8        VPOT(MXDCT), VABC(MXDCT), DM(MXDCT), XI(MXDM)
       REAL*8        XF(MXDM), XP(MXDM), WK1(MXDCT), WK2(MXDCT)
       REAL*8        WK3(MXDCT), WK4(MXDCT), AL(MXDM), AR(MXDM)
       REAL*8        VOI(MXDM), X0(MXDM), rK(MXDM), rA(MXDM), VAR(MXDCT)
       REAL*8        EIGVC(MXDCT,LMTREORT), LANCZ(MXDCT,LMTREORT)
+      REAL*8        EIGVC_B(MXDCT,LMTREORT), EIGVC_C(MXDCT,LMTREORT)
       REAL*8        RANGE(5,7)
 c      REAL*8        WMTX(MXDCT,10)
 c     **
@@ -920,11 +925,19 @@ c
          CALL LANCZSG(CHANGE, DIM, IIL, IIU, INFO, NREORT, LMTREORT, NT, 
      &     NSEED, MXDCT, ABSTOL, IWK, MAXINT, NP, U1, V1, EIGVL, SHM, 
      &     WK1, WK2, VPOT, WK3, WK4, VAR, EIGVC, LANCZ)
+         IF(TPPROPG(1:8).EQ.'.COUPLE3')THEN
+            write(*,*)'not implemented for .coupled3'
+            stop
+         ENDIF
       ELSEIF(TPDIAG(1:7).EQ.'.LANCZS')THEN
          WRITE(*,*)'Using lanczos tri-diagonalization procedure,'
          CALL LANCZS(CHANGE, DIM, IIL, IIU, INFO, NREORT, LMTREORT, NT, 
      &     NSEED, MXDCT, ABSTOL, IWK, NP, U1, V1, EIGVL, SHM, WK1, 
      &     WK2, VPOT, WK3, WK4, VAR, EIGVC, LANCZ)
+         IF(TPPROPG(1:8).EQ.'.COUPLE3')THEN
+            write(*,*)'not implemented for .coupled3'
+            stop
+         ENDIF
       ELSE
          WRITE(*,*)'<<<>>> Initial eigenvalue(s) and eigenvector(s)', 
      &        'error <<<>>>'
@@ -956,6 +969,8 @@ c
          WRITE(*,*)'Exiting.'
          IF(FSTOP) STOP
       ENDIF
+
+
 c     ..
 c     .. If desired only energy program stop
       IF(TPCLC(1:7).EQ.'.ENERGY')GOTO 9999 
@@ -1009,6 +1024,76 @@ c
          ENDIF      
       ENDIF    
 c
+
+c------------------------------ eigenstates for 3 coupled propagations
+      IF(TPPROPG(1:8).EQ.'.COUPLE3')THEN
+         IF(TPDIAG(1:9).NE.'.MTRXDIAG')THEN
+            write(*,*) 'invalid diagonalization option for coupled3'
+            STOP
+         ENDIF
+         WRITE(*,*)'computing eigenstates for potential B'
+         call PRTPT('potB-m.dat ',9,nd,0,np,xp,xi,sh,VPOT(nt+1:2*nt))
+         CALL MTRXDIAG(DIM, IIL, IIU, INFOB, MXDCT, NT, ABSTOL, IWK, 
+     &        NP, EIGVL_B, SHM, VPOT(NT+1), WK1, WK2, EIGVC_B)
+         WRITE(*,*)'computing eigenstates for potential C'
+         CALL MTRXDIAG(DIM, IIL, IIU, INFOC, MXDCT, NT, ABSTOL, IWK, 
+     &        NP, EIGVL_C, SHM, VPOT(2*NT+1), WK1, WK2, EIGVC_C)
+      ENDIF
+
+      IF(TPPROPG(1:8).EQ.'.COUPLE3')THEN
+         IF(INFOB.EQ.0)THEN
+            WRITE(*,*)
+            WRITE(*,*)'Eigenvalues B:'
+            WRITE(*,*)'""""""""""""'
+            WRITE(*,1014)
+            WRITE(*,*)'|  Eigenstate  |  Eigenvalues   |'
+            WRITE(*,*)'================================='
+            DO I = IIL,IIU,1
+               WRITE(*,1015)I-1,EIGVL_B(I-IIL+1)*FATE
+               WRITE(*,1014)
+            ENDDO
+            IF(PRTEGVC .AND. INFO.EQ.0)THEN
+               WRITE(*,*)
+               WRITE(*,*)'Eigenvectors B:'
+               WRITE(*,*)'"""""""""""""'
+               CALL PRTEIGVC(TPDIAG, 6, MXDCT, ND, NIS, NP, XP, XI, SH, 
+     &              EIGVC_B)
+            ENDIF
+         ELSE
+            WRITE(*,*)'<<>> It wasn`t possible obtain eigenvalues and '
+     &           ,'eignvectors B correctly <<<>>>'
+            WRITE(*,*)'Exiting.'
+            IF(FSTOP) STOP
+         ENDIF
+
+         IF(INFOC.EQ.0)THEN
+            WRITE(*,*)
+            WRITE(*,*)'Eigenvalues C:'
+            WRITE(*,*)'""""""""""""'
+            WRITE(*,1014)
+            WRITE(*,*)'|  Eigenstate  |  Eigenvalues   |'
+            WRITE(*,*)'================================='
+            DO I = IIL,IIU,1
+               WRITE(*,1015)I-1,EIGVL_C(I-IIL+1)*FATE
+               WRITE(*,1014)
+            ENDDO
+            IF(PRTEGVC .AND. INFO.EQ.0)THEN
+               WRITE(*,*)
+               WRITE(*,*)'Eigenvectors C:'
+               WRITE(*,*)'"""""""""""""'
+               CALL PRTEIGVC(TPDIAG, 6, MXDCT, ND, NIS, NP, XP, XI, SH, 
+     &              EIGVC_C)
+            ENDIF
+         ELSE
+            WRITE(*,*)'<<>> It wasn`t possible obtain eigenvalues and '
+     &           ,'eignvectors C correctly <<<>>>'
+            WRITE(*,*)'Exiting.'
+            IF(FSTOP) STOP
+         ENDIF
+      ENDIF
+c------------------------------
+
+
       IF(PRTPOT)THEN
          WRITE(*,*)
          IF(TPPROPG(1:4).EQ.'.P2P')THEN
@@ -1552,10 +1637,12 @@ c     strong field interaction
                WRITE(*,*)
                WRITE(*,*)'Propagation on 3 PES coupled by strong  
      &fields will be performed!'
-               print*,'ti, tf',TI,TF
+               !print*,'ti, tf',TI,TF
+               NSTATES=IIU-IIL+1
                CALL coupled3(DIM,ND,NT,NP,XP,XI,SH,SHM,U1,V1,VPOT,VMINB,
      &              VMINC,gamma3,TDIPOL,OMG3,E03,TP3,TD3,T03,SNI3,
-     &              KL3,TI,TF,DT,NSHOT,MXDCT)
+     &              KL3,TI,TF,DT,NSHOT,MXDCT,LMTREORT,
+     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES)
 
             ELSE
                NC = ICHLENGTH(TPPROPG,0)

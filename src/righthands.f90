@@ -11,7 +11,7 @@ module rhside
   real(kind=dp), allocatable, dimension(:) :: U0,V0,VPOT
   real(kind=dp), dimension(3) :: omega,e0,tp,td,t0,sni,tdipol,gamma,xi,sh,shm,detun
 
-  public :: initialize_initguess, initialize_field, compute_rhside,psize,chkierr
+  public :: initialize_initguess, initialize_field, compute_rhside,psize,chkierr,chkierr2
   private
 contains
 
@@ -49,7 +49,7 @@ contains
 
 
     e0=e0_in; t0=t0_in; td=td_in; tp=tp_in; detun=detun_in; 
-    sni=sni_in; tdipol=tdipol_in;gamma=gamma_in
+    sni=sni_in; tdipol=tdipol_in;gamma=gamma_in;kl=kl_in
 
   end subroutine initialize_field
 
@@ -69,6 +69,8 @@ contains
     character (len=6) :: dimc
     real(kind=dp), parameter :: fs2au=41.3411D+0, ev2au=27.2114D+0
 
+    !open(unit=43,file='pulses_deb.dat') 
+
     if(dim.EQ.0)then
        dimc = '.1D'
     else if(dim.EQ.1)then
@@ -80,9 +82,19 @@ contains
        stop
     end if
 
+    ! write(*,*)
+    ! write(*,*) 'debug'
+    ! write(*,*)t,t/fs2au
+    ! write(*,*)
+    ! write(*,*)e0(1),t0(1),td(1),tp(1),detun(1),sni(1),kl(1)
+    ! write(*,*)
+    ! write(*,*)e0(2),t0(2),td(2),tp(2),detun(2),sni(2),kl(2)
+    ! read(*,*)
 
     E1 = EF(pul,e0(1),t0(1),td(1),tp(1),detun(1),sni(1),kl(1),t/fs2au)
     E2 = EF(pul,e0(2),t0(2),td(2),tp(2),detun(2),sni(2),kl(2),t/fs2au)   
+    
+    !write(43,*)t/fs2au,E1,E2
 
     G(1) = -0.5D+0 * (E1 * tdipol(1)) ! G12
     G(2) = -0.5D+0 * (E2 * tdipol(2)) ! G23 = G32*   
@@ -91,7 +103,7 @@ contains
     CSD(1) = dcos(detun(1) * t)
     SND(1) = dsin(detun(1) * t)
     CSD(2) = dcos(detun(2) * t)
-    SND(1) = dsin(detun(1) * t)
+    SND(2) = dsin(detun(2) * t)
     
     !----------------------------
     !---------Set right hand side
@@ -147,5 +159,17 @@ contains
     end if
 
   end subroutine chkierr
+
+!-----------------------------
+
+  subroutine chkierr2(ierr)
+    integer, intent(in) :: ierr
+
+    if(ierr.LT.0)then
+       write(*,*) 'error in iteration'
+       stop
+    end if
+
+  end subroutine chkierr2
 
 end module rhside

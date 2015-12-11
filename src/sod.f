@@ -87,7 +87,7 @@ C      print*, ">>>>",ABSORB
       ELSE
          DO I=1,N,1  
             UAUX = U2(I)
-            U2(I) = U1(I) + CST*WORK(I) ! WORK = H*U
+            U2(I) = U1(I) + CST*WORK(I) ! WORK = H*V
             U1(I) = UAUX
          ENDDO
       ENDIF
