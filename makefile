@@ -118,6 +118,7 @@ all:
 
 #
 espec:  $(OBJS)
+	make src/coupled3.o
 	make blas
 	make ffts
 	make lapack
