@@ -56,7 +56,10 @@ c     **
 c     ** Intrinsic functions 
 cdel      INTRINSIC     
 c     .. Start program
-      FAT = +2.1132D-9
+
+c     vinicius: I believe this conversion is wrong: FAT = +2.1132D-9 correct one FAT = + 2.286337114D-9
+c      FAT = +2.1132D-9
+      FAT = + 2.286337114D-9
       FATE = +2.29371276D+17*3.335664D-28 
       FATT = +1.5192676D+0 
       IF(EFC(1:5).EQ.'.GAUS')THEN

@@ -1642,7 +1642,7 @@ c     strong field interaction
                CALL coupled3(DIM,ND,NT,NP,XP,XI,SH,SHM,U1,V1,VPOT,VMINB,
      &              VMINC,gamma3,TDIPOL,OMG3,E03,TP3,TD3,T03,SNI3,
      &              KL3,TI,TF,DT,NSHOT,MXDCT,LMTREORT,
-     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES)
+     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES,PRTEIGVC2)
 
             ELSE
                NC = ICHLENGTH(TPPROPG,0)

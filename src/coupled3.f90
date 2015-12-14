@@ -1,5 +1,6 @@
 subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gamma,&
-     tdipol,omega,e0,tp,td,t0,sni,kl,ti,tf,dt,nshot,mxdct,lmtreort,eigA,eigB,eigC,nstates)
+     tdipol,omega,e0,tp,td,t0,sni,kl,ti,tf,dt,nshot,mxdct,lmtreort,eigA,eigB,eigC,nstates,&
+     prteigvc2)
   !------------------------------------------------------
   !     
   !     subroutine to compute wavepacket propagation 
@@ -27,6 +28,7 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   real(kind=dp), dimension(3*n) :: VPOT
   real(kind=dp), dimension(6*n) :: Y, F, HY
   real(kind=dp), intent(in), dimension(mxdct,lmtreort) :: eigA,eigB,eigC
+  logical, intent(in) :: prteigvc2
 
   !-----local variables
   integer i,j,k,ntime,ierr,dim_int
@@ -222,34 +224,36 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
      call FCVREINIT(t,Y,1,1.0d-16,1.0d-16,ierr); call  chkierr(ierr)
      !-----------------------
 
-     !-----------printing wavepackets----------------------------
-     WRITE(CHNUM,'(I4)')i
-     t = t/fs2au
-     IF(i.LT.10)THEN
-        NEWNAM3 = 'ReImC_000'//CHNUM(4:4)//'.dat'
-        NEWNAM2 = 'ReImB_000'//CHNUM(4:4)//'.dat'
-        NEWNAM1 = 'ReImA_000'//CHNUM(4:4)//'.dat'
-     ELSEIF(i.LT.100)THEN
-        NEWNAM3 = 'ReImC_00'//CHNUM(3:4)//'.dat'
-        NEWNAM2 = 'ReImB_00'//CHNUM(3:4)//'.dat'
-        NEWNAM1 = 'ReImA_00'//CHNUM(3:4)//'.dat'
-     ELSEIF(i.LT.1000)THEN
-        NEWNAM3 = 'ReImC_0'//CHNUM(2:4)//'.dat'
-        NEWNAM2 = 'ReImB_0'//CHNUM(2:4)//'.dat'
-        NEWNAM1 = 'ReImA_0'//CHNUM(2:4)//'.dat'
-     ELSEIF(i.LT.10000)THEN
-        NEWNAM3 = 'ReImC_'//CHNUM(1:4)//'.dat'
-        NEWNAM2 = 'ReImB_'//CHNUM(1:4)//'.dat'
-        NEWNAM1 = 'ReImA_'//CHNUM(1:4)//'.dat'
-     ELSE
-        WRITE(*,*)'Too many files to be printed! Stopping'
-        STOP
-     ENDIF
+     if(prteigvc2) then
+        !-----------printing wavepackets----------------------------
+        WRITE(CHNUM,'(I4)')i
+        t = t/fs2au
+        IF(i.LT.10)THEN
+           NEWNAM3 = 'ReImC_000'//CHNUM(4:4)//'.dat'
+           NEWNAM2 = 'ReImB_000'//CHNUM(4:4)//'.dat'
+           NEWNAM1 = 'ReImA_000'//CHNUM(4:4)//'.dat'
+        ELSEIF(i.LT.100)THEN
+           NEWNAM3 = 'ReImC_00'//CHNUM(3:4)//'.dat'
+           NEWNAM2 = 'ReImB_00'//CHNUM(3:4)//'.dat'
+           NEWNAM1 = 'ReImA_00'//CHNUM(3:4)//'.dat'
+        ELSEIF(i.LT.1000)THEN
+           NEWNAM3 = 'ReImC_0'//CHNUM(2:4)//'.dat'
+           NEWNAM2 = 'ReImB_0'//CHNUM(2:4)//'.dat'
+           NEWNAM1 = 'ReImA_0'//CHNUM(2:4)//'.dat'
+        ELSEIF(i.LT.10000)THEN
+           NEWNAM3 = 'ReImC_'//CHNUM(1:4)//'.dat'
+           NEWNAM2 = 'ReImB_'//CHNUM(1:4)//'.dat'
+           NEWNAM1 = 'ReImA_'//CHNUM(1:4)//'.dat'
+        ELSE
+           WRITE(*,*)'Too many files to be printed! Stopping'
+           STOP
+        ENDIF
 
-     CALL PRPT2(NEWNAM1,8,ND,t/fs2au,NP,XP,XI,SH,Y(1:n),Y(n+1:2*n))
-     CALL PRPT2(NEWNAM2,8,ND,t/fs2au,NP,XP,XI,SH,Y(2*n+1:3*n),Y(3*n+1:4*n))
-     CALL PRPT2(NEWNAM3,8,ND,t/fs2au,NP,XP,XI,SH,Y(4*n+1:5*n),Y(5*n+1:6*n))
-     !-----------------------------------------------------------------
+        CALL PRPT2(NEWNAM1,8,ND,t/fs2au,NP,XP,XI,SH,Y(1:n),Y(n+1:2*n))
+        CALL PRPT2(NEWNAM2,8,ND,t/fs2au,NP,XP,XI,SH,Y(2*n+1:3*n),Y(3*n+1:4*n))
+        CALL PRPT2(NEWNAM3,8,ND,t/fs2au,NP,XP,XI,SH,Y(4*n+1:5*n),Y(5*n+1:6*n))
+        !-----------------------------------------------------------------
+     end if
 
      !--- Print field
      E1 = EF(pul,e0(1),t0(1),td(1),tp(1),detun(1),sni(1),kl(1),t)
