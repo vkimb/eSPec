@@ -224,10 +224,11 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
      call FCVREINIT(t,Y,1,1.0d-16,1.0d-16,ierr); call  chkierr(ierr)
      !-----------------------
 
+     t = t/fs2au
+
      if(prteigvc2) then
         !-----------printing wavepackets----------------------------
         WRITE(CHNUM,'(I4)')i
-        t = t/fs2au
         IF(i.LT.10)THEN
            NEWNAM3 = 'ReImC_000'//CHNUM(4:4)//'.dat'
            NEWNAM2 = 'ReImB_000'//CHNUM(4:4)//'.dat'
