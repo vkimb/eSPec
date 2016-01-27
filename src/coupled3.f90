@@ -1,6 +1,6 @@
 subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gamma,&
      tdipol,omega,e0,tp,td,t0,sni,kl,ti,tf,dt,nshot,mxdct,lmtreort,eigA,eigB,eigC,nstates,&
-     prteigvc2)
+     prteigvc2,n_fourier)
   !------------------------------------------------------
   !     
   !     subroutine to compute wavepacket propagation 
@@ -48,6 +48,11 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   character*30 pfmt
   character (len=*), parameter ::  pul=".ENVG "
   real(kind=dp), parameter :: fs2au=41.3411D+0, ev2au=27.2114D+0
+  
+  !---- FFTW variables !---- n_fourier não definido na rotina principal
+  complex(kind=dp), dimension(n_fourier) :: rho12_t, rho12_v, rho23_t, rho23_v
+  integer(kind=C_LONG) :: plan
+
 
   !----------------------------------------------
 
@@ -123,7 +128,7 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
      Y(j_long) = 0.0d+0    !Re part
      j_long = j+3*n
      Y(j_long) = 0.0d+0    !Im part
-
+     
      !---  x_3
      j_long = j+4*n     
      Y(j_long) = 0.0d+0    !Re part
@@ -290,6 +295,10 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
 
      !-----------------------------------------------------------------
 
+     !------- cross section related quantities
+     call wp3_rho(Y,n,rho)
+     !-----------------------------------------------------------------
+
 
   end do
   !--------------------
@@ -298,6 +307,10 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   write(*,*)
   write(*,'(A13,F10.2,A)') 'total time = ',t_total,'s'
   write(*,*)'propagation finished!'
+
+
+
+
 
   !------------------------------------------------------
   write(*,*)
@@ -359,6 +372,38 @@ subroutine wp3_norm(Y,n,norm)
   end do
 
 end subroutine wp3_norm
+
+
+!---------------------------------
+!  computes the scalar products < x_1 | x_2 > and < x_2 | x_3 >
+!---------------------------------
+subroutine wp3_rho(Y,n,rho)
+  use iso_c_binding
+  integer, parameter :: dp=kind(1.0d00)
+  integer, intent(in)  :: n
+  real(kind=dp), dimension(6*n),intent(in) :: Y
+
+  integer(kind=C_LONG) i,jr,ji,kr,ki
+  real(kind=dp), dimension(2,2), intent(out) :: rho
+
+  rho = 0.0d00
+
+  do i=1,n
+     ! rho_12
+     jr = i; ji = n + i;
+     kr = 2*n + i; ki = 3*n + i;
+     rho(1,1) = rho(1,1) + Y(jr)*Y(kr) + Y(ji)*Y(ki)
+     rho(1,2) = rho(1,2) + Y(ji)*Y(kr) - Y(jr)*Y(ki)
+     
+     ! rho_23
+     jr = 2*n + i; ji = 3*n + i;
+     kr = 4*n + i; ki = 5*n + i;
+     rho(2,1) = rho(2,1) + Y(jr)*Y(kr) + Y(ji)*Y(ki)
+     rho(2,2) = rho(2,2) + Y(ji)*Y(kr) - Y(jr)*Y(ki)
+        
+  end do
+
+end subroutine wp3_rho
 
 
 !---------------------------------
