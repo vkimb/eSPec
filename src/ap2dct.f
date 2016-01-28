@@ -8,7 +8,7 @@ c     ** Parameters
       PARAMETER     (ZERO = +0.0D+0, ONE = +1.0D+0, SIXTEEN = +1.6D+1, 
      &     THIRTY = 3.0D+1)
 c     ** Local scalars
-      INTEGER I,J,L,M,N
+      INTEGER*8 I,J,L,M,N
       REAL*8 SHT,APAUX
 *     Authors
 *     =======

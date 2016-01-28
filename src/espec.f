@@ -38,7 +38,7 @@ c     ** Scalar arguments
       CHARACTER*1   DR
       CHARACTER*2   CHAUX
       CHARACTER*3   TDI
-      CHARACTER*5   DIM
+      CHARACTER*6   DIM
       CHARACTER*12  OUTFAT, PRTCRL, TPDIAG, TPPROPG
       CHARACTER*12  TPTRANS, TPWIND, EFC, INIEIGVC, TPDIPL
       CHARACTER*14  INPUT, TPCLC
@@ -48,7 +48,8 @@ c     ** Scalar arguments
       INTEGER       I, IIL, IIU, IFL, IFU, INFO, J, K, MC, NDAUX,NREG
       INTEGER       INFOB,INFOC
       INTEGER       MF, MP, MPR, MPI, NC, NFS, NSEED, NIS, ND, NDT
-      INTEGER       NT, NREORT, NSHOT, NPR, MAXINT, KP, KL, KLX, ISC
+      INTEGER*8    NT,HSIZE
+      INTEGER        NREORT, NSHOT, NPR, MAXINT, KP, KL, KLX, ISC
       REAL*8        ABSTOL, CS, DE, DT, DTF, T, TI, TF, TOL, SC, WP
       REAL*8        FATE, FATL, FATT, E0, T0, TD, TP, OMG, SNI, E1I
       REAL*8        CHWHM, ALPHA, ADE, RABI, XM, XMIN, XMINB,XMINC      
@@ -261,6 +262,9 @@ c     .. Calculating the total dimension
          NT = NT*NP(I)
       ENDDO
  10   CONTINUE
+
+      HSIZE = NT*(NT+1)/2       ! size of half-symmetrical hamiltonian matrix
+
       IF(DIM(1:4).EQ.'.2DC' .OR. DIM(1:4).EQ.'.2D' .AND.
      &     (POTCH(1:8).EQ.'.LEPS_CC' .OR. POTCHF(1:8).EQ.'.LEPS_CC')
      &     )THEN
@@ -917,8 +921,9 @@ d     &           'eigenvectors calculation'
 c
       IF(TPDIAG(1:9).EQ.'.MTRXDIAG')THEN
          WRITE(*,*)'Using complete matrix diagonalization procedure,'
+         WRITE(*,*) 'espec',NT,HSIZE
          CALL MTRXDIAG(DIM, IIL, IIU, INFO, MXDCT, NT, ABSTOL, IWK, 
-     &        NP, EIGVL, SHM, VPOT, WK1, WK2, EIGVC)
+     &        NP, EIGVL, SHM, VPOT, WK1, WK2, EIGVC,HSIZE)
       ELSEIF(TPDIAG(1:8).EQ.'.LANCZSG')THEN
          WRITE(*,*)'Using interative lanczos tri-diagonalization ',
      &        'procedure,'
@@ -1034,10 +1039,10 @@ c------------------------------ eigenstates for 3 coupled propagations
          WRITE(*,*)'computing eigenstates for potential B'
          call PRTPT('potB-m.dat ',9,nd,0,np,xp,xi,sh,VPOT(nt+1:2*nt))
          CALL MTRXDIAG(DIM, IIL, IIU, INFOB, MXDCT, NT, ABSTOL, IWK, 
-     &        NP, EIGVL_B, SHM, VPOT(NT+1), WK1, WK2, EIGVC_B)
+     &        NP, EIGVL_B, SHM, VPOT(NT+1), WK1, WK2, EIGVC_B,HSIZE)
          WRITE(*,*)'computing eigenstates for potential C'
          CALL MTRXDIAG(DIM, IIL, IIU, INFOC, MXDCT, NT, ABSTOL, IWK, 
-     &        NP, EIGVL_C, SHM, VPOT(2*NT+1), WK1, WK2, EIGVC_C)
+     &        NP, EIGVL_C, SHM, VPOT(2*NT+1), WK1, WK2, EIGVC_C,HSIZE)
       ENDIF
 
       IF(TPPROPG(1:8).EQ.'.COUPLE3')THEN
@@ -1141,7 +1146,7 @@ c     .. Calculate eignvalues and eignvectors of final state
          IF(TPDIAG(1:9).EQ.'.MTRXDIAG')THEN
             WRITE(*,*)'Using complete matrix diagonalization procedure.'
             CALL MTRXDIAG(DIM, IFL, IFU, INFO, MXDCT, NT, ABSTOL, IWK, 
-     &           NP, EIGVL, SHM, VPOT, WK1, WK2, EIGVC)
+     &           NP, EIGVL, SHM, VPOT, WK1, WK2, EIGVC,HSIZE)
          ELSEIF(TPDIAG(1:7).EQ.'.LANCZS')THEN
             WRITE(*,*)'Using lanczos tri-diagonalization procedure.'
             CALL LANCZS(CHANGE, DIM, IFL, IFU, INFO, NREORT, LMTREORT, 
@@ -1642,7 +1647,7 @@ c     strong field interaction
                CALL coupled3(DIM,ND,NT,NP,XP,XI,SH,SHM,U1,V1,VPOT,VMINB,
      &              VMINC,gamma3,TDIPOL,OMG3,E03,TP3,TD3,T03,SNI3,
      &              KL3,TI,TF,DT,NSHOT,MXDCT,LMTREORT,
-     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES,PRTEIGVC2)
+     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES,PRTEIGVC2,MF)
 
             ELSE
                NC = ICHLENGTH(TPPROPG,0)

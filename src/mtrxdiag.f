@@ -1,11 +1,12 @@
       SUBROUTINE MTRXDIAG(DIM, IL, IU, INFO, MXDCT, N, ABSTOL, IWORK, 
-     &     NP, EIGVL, SHM, VPOT, WORK, WK, EIGVC)
+     &     NP, EIGVL, SHM, VPOT, WORK, WK, EIGVC, HSIZE)
       IMPLICIT NONE
 c     **
 c     ** Scalar arguments 
 c     del      LOGICAL       
       CHARACTER*(*) DIM
-      INTEGER       IL, IU, INFO, MXDCT, N
+      INTEGER*8 N,HSIZE
+      INTEGER IL, IU, INFO, MXDCT
       REAL*8        ABSTOL
 c     **
 c     ** Array arguments
@@ -51,7 +52,7 @@ c     ** Array scalars
 c     del      LOGICAL       
 c     del      CHARACTER*1   
       INTEGER       IFAIL(50)
-      REAL*8        AP(N*(N+1)/2)
+      REAL*8        AP(HSIZE)
 
 c     ** External subroutines 
       EXTERNAL      DSPEVX
@@ -59,7 +60,9 @@ c     **
 c     ** Intrinsic functions 
 c     del      INTRINSIC     
 c     .. Start program
-      
+
+      write(*,*) HSIZE, SIZE(AP)
+
 c     * generate Hamiltonian matrix <<>>><<<>>><<<>>><<<>>><<<>>><<<>>><<<
 c     .. Change between one and two-dimension  
       IF(DIM(1:3).EQ.'.1D')THEN

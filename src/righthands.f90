@@ -123,8 +123,12 @@ contains
        wkg(1) = G(1)*(Y(2*n+j)*CSD(1) - Y(3*n+j)*SND(1)) ! exp(i detun1) x_2 = wkg1 + i wkg2
        wkg(2) = G(1)*(Y(3*n+j)*CSD(1) + Y(2*n+j)*SND(1))
 
-       F(j) =  HY(n+j) + wkg(2) -gamma(1)*Y(n+j)
-       F(n+j) = -(HY(j) + wkg(1) -gamma(1)*Y(j))
+       !F(j) =  HY(n+j) + wkg(2) -gamma(1)*Y(n+j)
+       !F(n+j) = -(HY(j) + wkg(1) -gamma(1)*Y(j))
+
+       F(j) =  HY(n+j) + wkg(2) -gamma(1)*Y(j)
+       F(n+j) = -(HY(j) + wkg(1) +gamma(1)*Y(n+j))
+
 
        !-----------x_2            
        wkg(3) = G(1)*(Y(j)*CSD(1) + Y(n+j)*SND(1)) ! exp(-i detun1) x_1 = wkg3 + i wkg4
@@ -133,15 +137,22 @@ contains
        wkg(4) = G(1)*(Y(n+j)*CSD(1) - Y(j)*SND(1))
        wkg(6) = G(2)*(Y(5*n+j)*CSD(2) - Y(4*n+j)*SND(2))
 
-       F(2*n+j) = HY(3*n+j) + wkg(4) + wkg(6) -gamma(2)*Y(3*n+j)
-       F(3*n+j) = -(HY(2*n+j) + wkg(3) + wkg(5) -gamma(2)*Y(2*n+j))
+       !F(2*n+j) = HY(3*n+j) + wkg(4) + wkg(6) -gamma(2)*Y(3*n+j)
+       !F(3*n+j) = -(HY(2*n+j) + wkg(3) + wkg(5) -gamma(2)*Y(2*n+j))
+
+       F(2*n+j) = HY(3*n+j) + wkg(4) + wkg(6) -gamma(2)*Y(2*n+j)
+       F(3*n+j) = -(HY(2*n+j) + wkg(3) + wkg(5) +gamma(2)*Y(3*n+j))
 
        !-----------x_3            
        wkg(7) = G(2)*(Y(2*n+j)*CSD(2) - Y(3*n+j)*SND(2)) ! exp(i detun2) x_2 = wkg7 + i wkg8            
        wkg(8) = G(2)*(Y(3*n+j)*CSD(2) + Y(2*n+j)*SND(2))
 
-       F(4*n+j) = HY(5*n+j) + wkg(8) -gamma(3)*Y(5*n+j)
-       F(5*n+j) = -(HY(4*n+j) + wkg(7) -gamma(3)*Y(4*n+j))
+       !F(4*n+j) = HY(5*n+j) + wkg(8) -gamma(3)*Y(5*n+j)
+       !F(5*n+j) = -(HY(4*n+j) + wkg(7) -gamma(3)*Y(4*n+j))
+
+       F(4*n+j) = HY(5*n+j) + wkg(8) -gamma(3)*Y(4*n+j)
+       F(5*n+j) = -(HY(4*n+j) + wkg(7) +gamma(3)*Y(5*n+j))
+
     end do
     !----------------------------
 

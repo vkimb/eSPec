@@ -14,11 +14,12 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
 
   use rhside
   use iso_c_binding
+  !include ’fftw3.f03’
 
   implicit none
   integer, parameter :: dp=kind(1.0d00)
   !------external arguments (from eSPec)
-  integer, intent(in) :: n,nd,nshot,mxdct,lmtreort,nstates
+  integer, intent(in) :: n,nd,nshot,mxdct,lmtreort,nstates,n_fourier
   integer, dimension(3), intent(in) :: np,kl
   character (len=*) :: dim
   real(kind=dp) VMINB,VMINC,t,dt, ti, tf,EF,xp,tout,start_t,stop_t,t_total
@@ -48,10 +49,11 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   character*30 pfmt
   character (len=*), parameter ::  pul=".ENVG "
   real(kind=dp), parameter :: fs2au=41.3411D+0, ev2au=27.2114D+0
-  
+  real(kind=dp), dimension(2,2) :: rho
+
   !---- FFTW variables !---- n_fourier não definido na rotina principal
   complex(kind=dp), dimension(n_fourier) :: rho12_t, rho12_v, rho23_t, rho23_v
-  integer(kind=C_LONG) :: plan
+  type(C_PTR) ::  plan
 
 
   !----------------------------------------------
@@ -273,8 +275,8 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
      call wp3_norm(Y,n,norm)
      norm_diff = dabs(norm_last - (norm(1)+norm(2)+norm(3)) )
      norm_last = norm(1)+norm(2)+norm(3)
-     write(*,'(6ES18.9,5X,F5.2,A2)')t,norm(1),norm(2),norm(3),norm(1)+norm(2)+norm(3),norm_diff,stop_t-start_t,'s'
-     write(43,'(5ES18.9)')t,norm(1),norm(2),norm(3),norm(1)+norm(2)+norm(3)
+     write(*,'(6ES21.9,5X,F5.2,A2)')t,norm(1),norm(2),norm(3),norm(1)+norm(2)+norm(3),norm_diff,stop_t-start_t,'s'
+     write(43,'(5ES21.9)')t,norm(1),norm(2),norm(3),norm(1)+norm(2)+norm(3)
      t_total = t_total + stop_t-start_t
 
      !-----------wavepacket projection on eigenstates------------------
@@ -371,6 +373,12 @@ subroutine wp3_norm(Y,n,norm)
      norm(3) = norm(3) + Y(jr)*Y(jr) + Y(ji)*Y(ji)
   end do
 
+  do i=1,3
+     if(norm(i).LT.1.0d-99)then
+        norm(i) = 0.0d0
+     end if
+  end do
+
 end subroutine wp3_norm
 
 
@@ -392,14 +400,14 @@ subroutine wp3_rho(Y,n,rho)
      ! rho_12
      jr = i; ji = n + i;
      kr = 2*n + i; ki = 3*n + i;
-     rho(1,1) = rho(1,1) + Y(jr)*Y(kr) + Y(ji)*Y(ki)
-     rho(1,2) = rho(1,2) + Y(ji)*Y(kr) - Y(jr)*Y(ki)
+     rho(1,1) = rho(1,1) + Y(jr)*Y(kr) + Y(ji)*Y(ki) !real part
+     rho(1,2) = rho(1,2) + Y(ji)*Y(kr) - Y(jr)*Y(ki) !imaginary part
      
      ! rho_23
      jr = 2*n + i; ji = 3*n + i;
      kr = 4*n + i; ki = 5*n + i;
-     rho(2,1) = rho(2,1) + Y(jr)*Y(kr) + Y(ji)*Y(ki)
-     rho(2,2) = rho(2,2) + Y(ji)*Y(kr) - Y(jr)*Y(ki)
+     rho(2,1) = rho(2,1) + Y(jr)*Y(kr) + Y(ji)*Y(ki) !real part
+     rho(2,2) = rho(2,2) + Y(ji)*Y(kr) - Y(jr)*Y(ki) !imaginary part
         
   end do
 
