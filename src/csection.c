@@ -86,11 +86,16 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   //--------------------------------------------------
 
+  free(bcoefre12);free(bcoefim12);
+  free(bcoefre23);free(bcoefim23);
+  free(bcoefG12);free(bcoefG23);
+
   return 0;
 }
 
 
-//create routine that generates the fftw mirrored vectos using splines
+//routine that generates the fftw using splines
+// in this case we can't mirror the data (due to equations) but fftw periodicity can still be enforced since rho_ij(0) = 0
 int gen_data(int NTG,double tf,double *bcoefre, double *bcoefim, fftw_complex *Y){
   int i,s;
   double t,steptspl;
