@@ -1,2 +1,4 @@
+[![Documentation Status](https://readthedocs.org/projects/espec/badge/?version=latest)](http://espec.readthedocs.org/en/latest)
+
 # eSPec
-wave packet propagation code
+A wave packet propagation code
