@@ -1,4 +1,4 @@
-[![eSPec](http://forthebadge.com/images/badges/as-seen-on-tv.svg)](http://toolbox.readthedocs.org/)
+[![eSPec](http://espec.readthedocs.org/en/latest/?badge=latest](http://espec.readthedocs.org/en/latest/)
 
 # eSPec
 A wave packet propagation code
