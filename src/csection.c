@@ -26,7 +26,7 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   //--- fft variables
   int nE;
-  double *T,*E,Ei,aE,stepE;
+  double *T,*E,Ei,aE,stepE,steptspl;
   fftw_complex *rho12_t,*rho23_t,*rho12_v,*rho23_v,*G12_t, *G23_t,*G12_v, *G23_v;
 
   //--- spline variables
@@ -37,20 +37,40 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   
   //--default values--------
   kx = 6.0e+0;
+  //------------------------
 
-  
+  ntg = pow(2,n_fourier); // number of points to be used in the fourier transform
 
-  //------ do all splines ---------------------------
+
+  //---- allocate vectors
 
   T = malloc(n*sizeof(double));
   tknot = malloc((n+kx)*sizeof(double));
 
   bcoefre12 = malloc(n*sizeof(double));
   bcoefim12 = malloc(n*sizeof(double));
+
   bcoefre23 = malloc(n*sizeof(double));
   bcoefim23 = malloc(n*sizeof(double));
+
   bcoefG12  = malloc(n*sizeof(double));
+
   bcoefG23  = malloc(n*sizeof(double));
+
+  rho12_t = fftw_malloc(ntg * sizeof(fftw_complex));
+  rho12_v = fftw_malloc(ntg * sizeof(fftw_complex));
+
+  rho23_t = fftw_malloc(ntg * sizeof(fftw_complex));
+  rho23_v = fftw_malloc(ntg * sizeof(fftw_complex));
+
+  G12_t = fftw_malloc(ntg * sizeof(fftw_complex));
+  G12_v = fftw_malloc(ntg * sizeof(fftw_complex));
+
+  G23_t = fftw_malloc(ntg * sizeof(fftw_complex));
+  G23_v = fftw_malloc(ntg * sizeof(fftw_complex));
+  
+
+  //------ do all splines ---------------------------
   
 
   for(i=0;i<n;i++) T[i] = ti + i*stept;
@@ -62,8 +82,8 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   dbsint_ (&n,T,im_wr12,&kx,tknot,bcoefim12);
 
   // rho_23
-  dbsint_ (&n,T,re_wr12,&kx,tknot,bcoefre12);
-  dbsint_ (&n,T,im_wr12,&kx,tknot,bcoefim12);
+  dbsint_ (&n,T,re_wr12,&kx,tknot,bcoefre23);
+  dbsint_ (&n,T,im_wr12,&kx,tknot,bcoefim23);
 
   //G12
   dbsint_ (&n,T,G12,&kx,tknot,bcoefG12);
@@ -73,67 +93,78 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   //--------------------------------------------------
 
+  //--- generate data in ntg = 2 ^ M points using splines
 
-  //--- fourier transforms ---------------------------
-  ntg = pow(2,twopow);
-  steptspl=(2.0*T[nf-1])/ntg;
+  gen_data(n,ntg,kx,ti,tknot,bcoefre12,bcoefim12,rho12_t); // rho_12
+  gen_data(n,ntg,kx,ti,tknot,bcoefre23,bcoefim23,rho23_t); // rho_23
+  gen_data_real(n,ntg,kx,ti,tknot,bcoefG12,G12_t);         // G12
+  gen_data_real(n,ntg,kx,ti,tknot,bcoefG23,G23_t);         // G23
+
+  // free spline coefficient matrices
+  free(bcoefre12);free(bcoefim12);
+  free(bcoefre23);free(bcoefim23);
+  free(bcoefG12);free(bcoefG23);free(tknot);
+
+  //--- do fourier transforms ---------------------------
+  steptspl=(2.0*T[n-1])/ntg;
   stepE = 2*M_PI/(ntg*steptspl);
   E = malloc(ntg*sizeof(double));
 
-
+  do_fft(ntg,rho12_t,rho12_v);
+  do_fft(ntg,rho23_t,rho23_v);
+  do_fft(ntg,G12_t,G12_v);
+  do_fft(ntg,G23_t,G23_v);
   
+
   //--- compute cross-sections -----------------------
 
   //--------------------------------------------------
 
-  free(bcoefre12);free(bcoefim12);
-  free(bcoefre23);free(bcoefim23);
-  free(bcoefG12);free(bcoefG23);
+
+  // free fourier vectors
+  fftw_free(rho12_t);fftw_free(rho23_t);
+  fftw_free(rho12_v);fftw_free(rho23_v);
+  fftw_free(G12_t);fftw_free(G23_t);
+  fftw_free(G12_v);fftw_free(G23_v);
 
   return 0;
 }
 
 
+//--------------------------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------//
+
+
 //routine that generates the fftw using splines
 // in this case we can't mirror the data (due to equations) but fftw periodicity can still be enforced since rho_ij(0) = 0
-int gen_data(int NTG,double tf,double *bcoefre, double *bcoefim, fftw_complex *Y){
-  int i,s;
+int gen_data(int n,int NTG,int kx,double ti,double *tknot, double *bcoefre, double *bcoefim, fftw_complex *workin){
+  int i;
   double t,steptspl;
 
-  steptspl = (2.0e+0 * tf)/NTG;
-
-  //generate mirrored data
+  //generate data  
   for(i=0;i<NTG;i++){
-    t = -T[nf-1] + i*steptspl;
-    fprintf(deb,"%lf ",t);
-    if(t < 0) s = -1.0e+0;
-    else s = 1.0e+0;
-
-    t = fabs(t);
-
-    if(strncasecmp(windtype,".SGAUSS",7)==0){
-      //TAUX = TMAX**2/(LOG(ONE/WP))**2 espec
-      //taux = pow(T[nf-1],2)/(log(1.000/width)/log(M_E));
-      taux = pow(T[nf-1],2)/pow(log(1.000/width),2);
-      window = exp(-pow(t,2)/taux);
-    }else if(strncasecmp(windtype,".EXPDEC",7)==0){
-      window = exp(-width*t);
-    }else if(strncasecmp(windtype,".NONE",7)==0){
-      window = 1.0e0;
-    }
-
-    //debug
-    //window=1.000;
-    workin[i][0] =   window*dbsval_ (&t,&kx,tknot,&nf,bcoefre);
-    workin[i][1] = s*window*dbsval_ (&t,&kx,tknot,&nf,bcoefim);
-    fprintf(deb,"%lf %lf \n",workin[i][0], workin[i][1]);
+    t = ti + i*steptspl;
+    workin[i][0] =  dbsval_ (&t,&kx,tknot,&n,bcoefre);
+    workin[i][1] =  dbsval_ (&t,&kx,tknot,&n,bcoefim);
   }
-
-
+  
+  return 0;
 }
 
-  //dbsval_ (&omega,&kx,xas_knot,&nxas,xas_bcoef);
+//routine that generates the fftw using splines for real data
+int gen_data_real(int n,int NTG,int kx,double ti,double *tknot,double *bcoefre, fftw_complex *workin){
+  int i;
+  double t,steptspl;
 
+  //generate data  
+  for(i=0;i<NTG;i++){
+    t = ti + i*steptspl;
+    workin[i][0] =  dbsval_ (&t,&kx,tknot,&n,bcoefre);
+    workin[i][1] =  0.0e+0;
+  }
+  
+  return 0;
 }
 
 //----------------------------
@@ -143,7 +174,7 @@ int do_fft(int NTG,fftw_complex *workin, fftw_complex *workout){
   fftw_plan p;
 
   //centers t=0 at the zero frequency position of the fft input vector(first) due to periodicity requirement of fft
-  center_fft(workin,NTG);
+  //center_fft(workin,NTG); not necessary because we're not inputting data from [-t,t] but rather [0,t]
 
   // FFTW_BACKWARD -> sign in the exponent = 1.
   p = fftw_plan_dft_1d(NTG,workin,workout,FFTW_BACKWARD,FFTW_ESTIMATE);

@@ -65,7 +65,7 @@ ESPEC_OBJS = src/rdinput.o src/compar.o src/chlength.o src/rdpt.o \
 	src/eigenergfft1.o src/absorb.o src/s2ppsod.o src/abm1.o \
 	src/s2ppabm.o src/sod1.o src/s2ppabm2.o src/init_cond.o src/gauss.o \
 	src/ap1d.o src/ap2d.o src/ap2dct.o src/au2dct.o src/coupled3.o src/rdpt-min.o\
-	src/righthands.o 
+	src/righthands.o src/csection.o 
 #
 XESPEC_OBJS =	
 #
@@ -135,6 +135,10 @@ src/righthands.o: src/righthands.f90
 	$(FC) $(FFLAGS) -c src/righthands.f90
 	mv righthands.o src/
 	cp rhside.mod src/
+src/csection.o: src/csection.c src/splinesurf.f src/splinesurf.h src/fourier.c src/fourier.h
+	gcc -c src/csection.c -o src/csection.o
+	gcc -c src/fourier.c -o src/fourier.o
+	$(FC) $(FFLAGS) -c src/splinesurf.f -o src/splinesurf.o
 #
 normf:  src/normfs.o src/ecnorm.o src/spline.o src/chlength.o $(BLAS_OBJS)
 	make ffts
