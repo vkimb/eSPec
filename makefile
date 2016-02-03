@@ -65,7 +65,7 @@ ESPEC_OBJS = src/rdinput.o src/compar.o src/chlength.o src/rdpt.o \
 	src/eigenergfft1.o src/absorb.o src/s2ppsod.o src/abm1.o \
 	src/s2ppabm.o src/sod1.o src/s2ppabm2.o src/init_cond.o src/gauss.o \
 	src/ap1d.o src/ap2d.o src/ap2dct.o src/au2dct.o src/coupled3.o src/rdpt-min.o\
-	src/righthands.o src/csection.o 
+	src/righthands.o src/csection.o src/splinesurf.o
 #
 XESPEC_OBJS =	
 #
@@ -122,7 +122,7 @@ espec:  $(OBJS)
 	make blas
 	make ffts
 	make lapack
-	$(FC) $(FFLAGS) -o $(PROG) $(OBJS) $(BLAS_OBJS) $(LAPACK_OBJS) $(FFTS_OBJS) $(LDFLAGS) -static
+	$(FC) $(FFLAGS) -o $(PROG) $(OBJS) $(BLAS_OBJS) $(LAPACK_OBJS) $(FFTS_OBJS) $(LDFLAGS)
 	size $(PROG)
 	ln -sf $(PROG) espec.x
 	chmod a+xr $(PROG) espec.x
@@ -135,9 +135,11 @@ src/righthands.o: src/righthands.f90
 	$(FC) $(FFLAGS) -c src/righthands.f90
 	mv righthands.o src/
 	cp rhside.mod src/
-src/csection.o: src/csection.c src/splinesurf.f src/splinesurf.h src/fourier.c src/fourier.h
+src/csection.o: src/csection.c src/splinesurf.o
 	gcc -c src/csection.c -o src/csection.o
-	gcc -c src/fourier.c -o src/fourier.o
+
+
+src/splinesurf.o: src/splinesurf.f src/splinesurf.h
 	$(FC) $(FFLAGS) -c src/splinesurf.f -o src/splinesurf.o
 #
 normf:  src/normfs.o src/ecnorm.o src/spline.o src/chlength.o $(BLAS_OBJS)

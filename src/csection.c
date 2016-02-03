@@ -5,7 +5,6 @@
 
 
 #include "splinesurf.h"
-#include "fourier.h"
 
 /*
   Program: csection
@@ -19,7 +18,7 @@
   Stockholm, 19th of January of 2016
 */
 
-
+int center_fft(fftw_complex *out,int N);
 
 int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,double *re_wr23, double *im_wr23, double *G12, double *G23, int n_fourier,double *detun){
   int i,j;
@@ -188,4 +187,25 @@ int do_fft(int NTG,fftw_complex *workin, fftw_complex *workout){
 
   //--------------------------------------------------
   return 0;
+}
+
+
+/*
+ shifts zero frequency to the center of the array
+*/
+
+int center_fft(fftw_complex *out,int N){
+  int i;
+  double work;
+
+  //centering the fourier transform
+  for(i=0;i<N/2;i++){
+    work= out[N/2 +i][0];
+    out[N/2 +i][0] = out[i][0];
+    out[i][0] = work;
+
+    work= out[N/2 +i][1];
+    out[N/2 +i][1] = out[i][1];
+    out[i][1] = work;  
+  }
 }
