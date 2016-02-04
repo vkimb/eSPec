@@ -1,6 +1,6 @@
 subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gamma,&
      tdipol,omega,e0,tp,td,t0,sni,kl,ti,tf,dt,nshot,mxdct,lmtreort,eigA,eigB,eigC,nstates,&
-     prteigvc2,n_fourier)
+     prteigvc2,m_fourier)
   !------------------------------------------------------
   !     
   !     subroutine to compute wavepacket propagation 
@@ -16,10 +16,13 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   use iso_c_binding
   !include ’fftw3.f03’
 
+
   implicit none
+
+
   integer, parameter :: dp=kind(1.0d00)
   !------external arguments (from eSPec)
-  integer, intent(in) :: n,nd,nshot,mxdct,lmtreort,nstates,n_fourier
+  integer, intent(in) :: n,nd,nshot,mxdct,lmtreort,nstates,m_fourier
   integer, dimension(3), intent(in) :: np,kl
   character (len=*) :: dim
   real(kind=dp) VMINB,VMINC,t,dt, ti, tf,EF,xp,tout,start_t,stop_t,t_total
@@ -39,7 +42,8 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
 
   real(kind=dp), dimension(6) :: ROUT
   real(kind=dp), dimension(1) :: RPAR=0.0d0
-  real(kind=dp), dimension(3) :: detun,G,CSD,SND
+  real(kind=c_double), dimension(3) :: detun
+  real(kind=dp), dimension(3) :: G,CSD,SND
   real(kind=dp), dimension(8) :: WKG
   real(kind=dp) :: E1,E2,var,norm_last,norm_diff
   real(kind=dp), dimension(3) :: norm
@@ -50,10 +54,11 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   character (len=*), parameter ::  pul=".ENVG "
   real(kind=dp), parameter :: fs2au=41.3411D+0, ev2au=27.2114D+0
   real(kind=dp), dimension(2,2) :: rho
-
-  !---- FFTW variables !---- n_fourier não definido na rotina principal
-  complex(kind=dp), dimension(n_fourier) :: rho12_t, rho12_v, rho23_t, rho23_v
-  type(C_PTR) ::  plan
+  
+  integer ( c_int )  :: c_ntime,n_fourier
+  real ( c_double )  :: c_ti, c_stept
+  real(kind=C_DOUBLE),dimension(:),allocatable :: re_rho12_t,im_rho12_t, re_rho23_t, im_rho23_t,G12_t,G23_t
+  real(kind=C_DOUBLE),dimension(2**m_fourier) :: sigma_xas,sigma_rixs
 
 
   !----------------------------------------------
@@ -61,6 +66,7 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   !-- output files
   open(unit=42,file='pulses.dat')
   open(unit=43,file='total_population.dat')
+  open(unit=49,file='rho_G.dat')
   
   write(pfmt,'(A,I4,A)')'(',nstates+1,'(1X,ES18.9))'
 
@@ -87,6 +93,15 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
 
   !-----number of propagation steps
   ntime = 1 + (tf - ti)/dt
+  c_ntime=ntime;
+
+  !allocate arrays for cross-section calculation
+  allocate(re_rho12_t(ntime))
+  allocate(im_rho12_t(ntime))
+  allocate(re_rho23_t(ntime))
+  allocate(im_rho23_t(ntime))
+  allocate(G12_t(ntime))
+  allocate(G23_t(ntime))
 
   print*, 'inside coupled3'
   !     debugs
@@ -213,6 +228,15 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   write(45,pfmt)t,(P_B(1,k)*P_B(1,k) + P_B(2,k)*P_B(2,k),k=1,nstates)
   write(46,pfmt)t,(P_C(1,k)*P_C(1,k) + P_C(2,k)*P_C(2,k),k=1,nstates)
 
+  ! first position must be zero at t=0 naturally.
+  re_rho12_t(1)= 0.0e+0
+  im_rho12_t(1)= 0.0e+0
+  re_rho23_t(1)= 0.0e+0
+  im_rho23_t(1)= 0.0e+0
+  G12_t(1)= 0.0e+0
+  G23_t(1)= 0.0e+0
+  write(49,'(7ES21.9)')t,re_rho12_t(1),im_rho12_t(1),re_rho23_t(1),im_rho23_t(1),G12_t(1),G23_t(1)
+
 
   !---------time loop
   do i=2,ntime
@@ -299,20 +323,40 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
 
      !------- cross section related quantities
      call wp3_rho(Y,n,rho)
+     re_rho12_t(i)= rho(1,1)
+     im_rho12_t(i)= rho(1,2)
+     re_rho23_t(i)= rho(2,1)
+     im_rho23_t(i)= rho(2,2)
+     G12_t(i)= tdipol(1) * E1
+     G23_t(i)= tdipol(2) * E2
+
+     ! to avoid printing issues
+     if(G12_t(i).lt.1.0d-99)then
+        G12_t(i) = 0.0d+0
+     end if
+     
+     if(G23_t(i).lt.1.0d-99)then
+        G23_t(i) = 0.0d+0
+     end if
+
+
+     write(49,'(7ES21.9)')t,re_rho12_t(i),im_rho12_t(i),re_rho23_t(i),im_rho23_t(i),G12_t(i),G23_t(i)
      !-----------------------------------------------------------------
 
 
   end do
-  !--------------------
 
   
   write(*,*)
   write(*,'(A13,F10.2,A)') 'total time = ',t_total,'s'
   write(*,*)'propagation finished!'
+  write(*,*)
+  write(*,*)
 
-
-
-
+  write(*,*) 'Computing Cross-sections'
+  c_ti=ti; c_stept=dt
+  call f_csection (c_ti,c_stept,c_ntime,re_rho12_t,im_rho12_t,re_rho23_t,im_rho23_t,G12_t,G23_t,m_fourier)
+  
 
   !------------------------------------------------------
   write(*,*)
@@ -435,3 +479,25 @@ subroutine FCVFUN(T, Y, YDOT, IPAR, RPAR, IER)
 
   IER = 0
 end subroutine FCVFUN
+
+!wrapping fortran function for the cross-sections c routine
+subroutine f_csection(ti,stept,n,re_wr12, im_wr12, re_wr23, im_wr23,G12,G23,n_fourier)
+  use iso_c_binding
+  integer ( c_int ),  intent(in) :: n, n_fourier
+  real ( c_double ),  intent(in) :: ti, stept
+  real ( c_double ),  intent(in), dimension(n)  :: re_wr12, im_wr12, re_wr23, im_wr23
+  real ( c_double ),  intent(in), dimension(n)  ::  G12,  G23
+  
+  !---- interface to csection.c
+  interface
+     subroutine csection (  ti,  stept, n, re_wr12,  im_wr12, re_wr23,  im_wr23,  G12,  G23, n_fourier) bind ( c )
+       use iso_c_binding
+       integer ( c_int ),  VALUE :: n, n_fourier
+       real ( c_double ),  VALUE :: ti, stept
+       real ( c_double ), dimension(*)  :: re_wr12, im_wr12, re_wr23, im_wr23
+       real ( c_double ), dimension(*)  :: G12, G23
+     end subroutine csection
+  end interface
+  !print*,"fortran wrap, array size: ",re_wr12(m)
+  call csection (ti,stept,n,re_wr12, im_wr12, re_wr23, im_wr23,G12,G23,n_fourier)
+end subroutine f_csection

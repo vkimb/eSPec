@@ -18,14 +18,21 @@
   Stockholm, 19th of January of 2016
 */
 
+
+
+int gen_data(int n,double stept_spl,int NTG,int kx,double ti,double *tknot, double *bcoefre, double *bcoefim, fftw_complex *workin);
+int gen_data_real(int n,double stept_spl,int NTG,int kx,double ti,double *tknot,double *bcoefre, fftw_complex *workin);
+int do_fft(int NTG,fftw_complex *workin, fftw_complex *workout);
 int center_fft(fftw_complex *out,int N);
 
-int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,double *re_wr23, double *im_wr23, double *G12, double *G23, int n_fourier,double *detun){
-  int i,j;
+
+
+int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,double *re_wr23, double *im_wr23, double *G12, double *G23, int n_fourier){
+  int i,j,verbose;
 
   //--- fft variables
   int nE;
-  double *T,*E,Ei,aE,stepE,steptspl;
+  double *T,*E,Ei,aE,stepE,work;
   fftw_complex *rho12_t,*rho23_t,*rho12_v,*rho23_v,*G12_t, *G23_t,*G12_v, *G23_v;
 
   //--- spline variables
@@ -33,13 +40,32 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   double stept_spl;
   double *bcoefre12,*bcoefim12,*bcoefre23,*bcoefim23,*tknot;
   double *bcoefG12,*bcoefG23;
+
+  //--- debug file
+  FILE *deb=fopen("debug_csection.dat","w");
   
   //--default values--------
   kx = 6.0e+0;
+  verbose = 2; //2 -> debug
   //------------------------
 
-  ntg = pow(2,n_fourier); // number of points to be used in the fourier transform
+  if(verbose=2) printf("\n Starting cross-section routine \n");
 
+  ntg = pow(2,n_fourier); // number of points to be used in the fourier transform
+  
+  if(verbose=2){
+    printf(" n = %d \n",n);
+    printf(" n_fourier = %d \n",n_fourier);
+    printf(" number of points in the fourier transform: %d \n",ntg);
+    printf(" initial time : %lf \n",ti);
+    printf(" time step : %lf \n",stept);
+    printf("-> %E \n",re_wr12[n-1]);
+
+    /* for(i=0;i<n;i++){ */
+    /*   T[0] = ti + i*stept; */
+    /*   fprintf(deb,"%lf %lf %lf %lf %lf \n",T[0],re_wr12[i],im_wr12[i],re_wr23[i],im_wr23[i]); */
+    /* } */
+  }
 
   //---- allocate vectors
 
@@ -67,7 +93,8 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   G23_t = fftw_malloc(ntg * sizeof(fftw_complex));
   G23_v = fftw_malloc(ntg * sizeof(fftw_complex));
-  
+
+  if(verbose=2) printf("\n arrays allocated \n");
 
   //------ do all splines ---------------------------
   
@@ -75,6 +102,9 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   for(i=0;i<n;i++) T[i] = ti + i*stept;
 
   dbsnak_ (&n, T, &kx, tknot);
+
+  //for(i=0;i<n;i++) printf("%lf %lf \n",T[i],tknot[i]); 
+  //for(i=n-1;i<n+kx;i++)printf("\t %lf \n",tknot[i]);
 
   // rho_12
   dbsint_ (&n,T,re_wr12,&kx,tknot,bcoefre12);
@@ -89,15 +119,23 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   //G23
   dbsint_ (&n,T,G23,&kx,tknot,bcoefG23);
-
+  
   //--------------------------------------------------
 
-  //--- generate data in ntg = 2 ^ M points using splines
+  if(verbose=2) printf("\n spline coefficients generated! \n");
 
-  gen_data(n,ntg,kx,ti,tknot,bcoefre12,bcoefim12,rho12_t); // rho_12
-  gen_data(n,ntg,kx,ti,tknot,bcoefre23,bcoefim23,rho23_t); // rho_23
-  gen_data_real(n,ntg,kx,ti,tknot,bcoefG12,G12_t);         // G12
-  gen_data_real(n,ntg,kx,ti,tknot,bcoefG23,G23_t);         // G23
+  //--- generate data in ntg = 2 ^ M points using splines
+  stept_spl = (T[n-1] - T[0])/ntg;
+
+  gen_data(n,stept_spl,ntg,kx,ti,tknot,bcoefre12,bcoefim12,rho12_t); // rho_12
+  gen_data(n,stept_spl,ntg,kx,ti,tknot,bcoefre23,bcoefim23,rho23_t); // rho_23
+  gen_data_real(n,stept_spl,ntg,kx,ti,tknot,bcoefG12,G12_t);         // G12
+  gen_data_real(n,stept_spl,ntg,kx,ti,tknot,bcoefG23,G23_t);         // G23
+
+  for(i=0;i<ntg;i++){
+    T[0] = ti + i*stept_spl;
+    fprintf(deb,"%lf %E %E \n",T[0],rho12_t[i][0],rho12_t[i][1]);
+  }
 
   // free spline coefficient matrices
   free(bcoefre12);free(bcoefim12);
@@ -105,8 +143,7 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   free(bcoefG12);free(bcoefG23);free(tknot);
 
   //--- do fourier transforms ---------------------------
-  steptspl=(2.0*T[n-1])/ntg;
-  stepE = 2*M_PI/(ntg*steptspl);
+  stepE = 2*M_PI/(ntg*stept_spl);
   E = malloc(ntg*sizeof(double));
 
   do_fft(ntg,rho12_t,rho12_v);
@@ -116,6 +153,7 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   
 
   //--- compute cross-sections -----------------------
+
 
   //--------------------------------------------------
 
@@ -137,13 +175,13 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
 //routine that generates the fftw using splines
 // in this case we can't mirror the data (due to equations) but fftw periodicity can still be enforced since rho_ij(0) = 0
-int gen_data(int n,int NTG,int kx,double ti,double *tknot, double *bcoefre, double *bcoefim, fftw_complex *workin){
+int gen_data(int n,double stept_spl,int NTG,int kx,double ti,double *tknot, double *bcoefre, double *bcoefim, fftw_complex *workin){
   int i;
-  double t,steptspl;
+  double t;
 
   //generate data  
   for(i=0;i<NTG;i++){
-    t = ti + i*steptspl;
+    t = ti + i*stept_spl;
     workin[i][0] =  dbsval_ (&t,&kx,tknot,&n,bcoefre);
     workin[i][1] =  dbsval_ (&t,&kx,tknot,&n,bcoefim);
   }
@@ -152,13 +190,13 @@ int gen_data(int n,int NTG,int kx,double ti,double *tknot, double *bcoefre, doub
 }
 
 //routine that generates the fftw using splines for real data
-int gen_data_real(int n,int NTG,int kx,double ti,double *tknot,double *bcoefre, fftw_complex *workin){
+int gen_data_real(int n,double stept_spl,int NTG,int kx,double ti,double *tknot,double *bcoefre, fftw_complex *workin){
   int i;
-  double t,steptspl;
+  double t;
 
   //generate data  
   for(i=0;i<NTG;i++){
-    t = ti + i*steptspl;
+    t = ti + i*stept_spl;
     workin[i][0] =  dbsval_ (&t,&kx,tknot,&n,bcoefre);
     workin[i][1] =  0.0e+0;
   }
