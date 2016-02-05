@@ -27,12 +27,15 @@ int center_fft(fftw_complex *out,int N);
 
 
 
-int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,double *re_wr23, double *im_wr23, double *G12, double *G23, int n_fourier){
+int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,double *re_wr23, double *im_wr23, double *G12, double *G23, double *detun, int n_fourier){
+
   int i,j,verbose;
 
+  double *sigma_xas, *sigma_rixs;
+  
   //--- fft variables
-  int nE;
-  double *T,*E,Ei,aE,stepE,work;
+  int nE,ierr;
+  double *T,*E,Ei,aE,stepE,work,tol,wk[2];
   fftw_complex *rho12_t,*rho23_t,*rho12_v,*rho23_v,*G12_t, *G23_t,*G12_v, *G23_v;
 
   //--- spline variables
@@ -43,9 +46,11 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   //--- debug file
   FILE *deb=fopen("debug_csection.dat","w");
+  FILE *debf=fopen("debug_fourier.dat","w");
   
   //--default values--------
   kx = 6.0e+0;
+  tol = 1.0e-15;
   verbose = 2; //2 -> debug
   //------------------------
 
@@ -59,7 +64,7 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
     printf(" number of points in the fourier transform: %d \n",ntg);
     printf(" initial time : %lf \n",ti);
     printf(" time step : %lf \n",stept);
-    printf("-> %E \n",re_wr12[n-1]);
+    printf("detunings %E %E \n",detun[0],detun[1]);
 
     /* for(i=0;i<n;i++){ */
     /*   T[0] = ti + i*stept; */
@@ -103,22 +108,28 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   dbsnak_ (&n, T, &kx, tknot);
 
-  //for(i=0;i<n;i++) printf("%lf %lf \n",T[i],tknot[i]); 
-  //for(i=n-1;i<n+kx;i++)printf("\t %lf \n",tknot[i]);
-
   // rho_12
   dbsint_ (&n,T,re_wr12,&kx,tknot,bcoefre12);
   dbsint_ (&n,T,im_wr12,&kx,tknot,bcoefim12);
 
   // rho_23
-  dbsint_ (&n,T,re_wr12,&kx,tknot,bcoefre23);
-  dbsint_ (&n,T,im_wr12,&kx,tknot,bcoefim23);
+  dbsint_ (&n,T,re_wr23,&kx,tknot,bcoefre23);
+  dbsint_ (&n,T,im_wr23,&kx,tknot,bcoefim23);
 
   //G12
   dbsint_ (&n,T,G12,&kx,tknot,bcoefG12);
 
   //G23
   dbsint_ (&n,T,G23,&kx,tknot,bcoefG23);
+
+  
+   //check if spline is correct
+  ierr=chk_spl(n,kx,T,tknot,re_wr12,bcoefre12,tol);if(ierr!=0)return 1;
+  ierr=chk_spl(n,kx,T,tknot,im_wr12,bcoefim12,tol);if(ierr!=0)return 1;
+  ierr=chk_spl(n,kx,T,tknot,re_wr23,bcoefre23,tol);if(ierr!=0)return 1;
+  ierr=chk_spl(n,kx,T,tknot,im_wr23,bcoefim23,tol);if(ierr!=0)return 1;
+  ierr=chk_spl(n,kx,T,tknot,G12,bcoefG12,tol);if(ierr!=0)return 1;
+  ierr=chk_spl(n,kx,T,tknot,G23,bcoefG23,tol);if(ierr!=0)return 1;
   
   //--------------------------------------------------
 
@@ -132,11 +143,6 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   gen_data_real(n,stept_spl,ntg,kx,ti,tknot,bcoefG12,G12_t);         // G12
   gen_data_real(n,stept_spl,ntg,kx,ti,tknot,bcoefG23,G23_t);         // G23
 
-  for(i=0;i<ntg;i++){
-    T[0] = ti + i*stept_spl;
-    fprintf(deb,"%lf %E %E \n",T[0],rho12_t[i][0],rho12_t[i][1]);
-  }
-
   // free spline coefficient matrices
   free(bcoefre12);free(bcoefim12);
   free(bcoefre23);free(bcoefim23);
@@ -144,16 +150,32 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   //--- do fourier transforms ---------------------------
   stepE = 2*M_PI/(ntg*stept_spl);
+  Ei = -ntg*stepE/(2.0E+0);
   E = malloc(ntg*sizeof(double));
+  for(i=0;i<ntg;i++)E[i] = Ei + i*stepE;
 
   do_fft(ntg,rho12_t,rho12_v);
   do_fft(ntg,rho23_t,rho23_v);
   do_fft(ntg,G12_t,G12_v);
   do_fft(ntg,G23_t,G23_v);
+
   
+
+  sigma_xas = malloc(ntg * sizeof(double));
 
   //--- compute cross-sections -----------------------
 
+  
+  for(i=0;i<ntg;i++){
+    T[0] = ti + i*stept_spl;
+
+    wk[0] = rho12_v[i][0] * G12_v[i][0] - rho12_v[i][1] * G12_v[i][1];
+    wk[1] = rho12_v[i][1] * G12_v[i][0] + rho12_v[i][0] * G12_v[i][1];
+    sigma_xas[i] = wk[1]*cos(detun[0]*T[0]) -  wk[0]*sin(detun[0]*T[0]);
+
+    fprintf(deb,"%lf %E %E \n",T[0],rho12_t[i][0],rho12_t[i][1],G12_t[i][0],G12_t[i][1] );
+    fprintf(debf,"%lf %E %E %E %E %E \n",E[i],rho12_v[i][0],rho12_v[i][1],G12_v[i][0],G12_v[i][1],sigma_xas[i]);
+  }
 
   //--------------------------------------------------
 
@@ -246,4 +268,27 @@ int center_fft(fftw_complex *out,int N){
     out[N/2 +i][1] = out[i][1];
     out[i][1] = work;  
   }
+}
+
+
+/* subroutine to check if the spline routine produced correct values */
+int chk_spl(int n, int kx, double *x, double *xknot, double *y, double *bcoef, double tol){
+  int i,m;
+  double chk_val,diff;
+
+  m=n/4;
+
+  for(i=0;i<n;i=i+m){
+    
+    chk_val = dbsval_ (&x[i],&kx,xknot,&n,bcoef);
+    diff = fabs(chk_val - y[i]);
+    
+    if(diff > tol){
+      printf("error!! spline routine error is above the %E tolerance! \n\n",tol);
+      return 1;
+    }
+    
+  }
+
+  return 0;
 }

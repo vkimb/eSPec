@@ -46,7 +46,7 @@ c     ** Scalar arguments
       CHARACTER*25  POTFILE, POTFILEF, FILEAUX, DMFILE, POTCH, POTCHF
       CHARACTER*172 TITLE
       INTEGER       I, IIL, IIU, IFL, IFU, INFO, J, K, MC, NDAUX,NREG
-      INTEGER       INFOB,INFOC
+      INTEGER       INFOB,INFOC,IERR
       INTEGER       MF, MP, MPR, MPI, NC, NFS, NSEED, NIS, ND, NDT
       INTEGER*8    NT,HSIZE
       INTEGER        NREORT, NSHOT, NPR, MAXINT, KP, KL, KLX, ISC
@@ -1647,7 +1647,13 @@ c     strong field interaction
                CALL coupled3(DIM,ND,NT,NP,XP,XI,SH,SHM,U1,V1,VPOT,VMINB,
      &              VMINC,gamma3,TDIPOL,OMG3,E03,TP3,TD3,T03,SNI3,
      &              KL3,TI,TF,DT,NSHOT,MXDCT,LMTREORT,
-     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES,PRTEIGVC2,MF)
+     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES,PRTEIGVC2,MF,IERR)
+               
+               IF(IERR.NE.0)THEN
+                  write(*,*) 'error in the coupled propagation!'
+                  write(*,*) 'program will stop!'
+                  STOP
+               END IF
 
             ELSE
                NC = ICHLENGTH(TPPROPG,0)

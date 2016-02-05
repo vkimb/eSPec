@@ -1,6 +1,6 @@
 subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gamma,&
      tdipol,omega,e0,tp,td,t0,sni,kl,ti,tf,dt,nshot,mxdct,lmtreort,eigA,eigB,eigC,nstates,&
-     prteigvc2,m_fourier)
+     prteigvc2,m_fourier,t_ierr)
   !------------------------------------------------------
   !     
   !     subroutine to compute wavepacket propagation 
@@ -33,6 +33,7 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   real(kind=dp), dimension(6*n) :: Y, F, HY
   real(kind=dp), intent(in), dimension(mxdct,lmtreort) :: eigA,eigB,eigC
   logical, intent(in) :: prteigvc2
+  integer, intent(out) :: t_ierr
 
   !-----local variables
   integer i,j,k,ntime,ierr,dim_int
@@ -355,8 +356,10 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
 
   write(*,*) 'Computing Cross-sections'
   c_ti=ti; c_stept=dt
-  call f_csection (c_ti,c_stept,c_ntime,re_rho12_t,im_rho12_t,re_rho23_t,im_rho23_t,G12_t,G23_t,m_fourier)
+  call f_csection (c_ti,c_stept,c_ntime,re_rho12_t,im_rho12_t,re_rho23_t,im_rho23_t,G12_t,G23_t,detun,m_fourier)
   
+
+  t_ierr = 0
 
   !------------------------------------------------------
   write(*,*)
@@ -481,23 +484,25 @@ subroutine FCVFUN(T, Y, YDOT, IPAR, RPAR, IER)
 end subroutine FCVFUN
 
 !wrapping fortran function for the cross-sections c routine
-subroutine f_csection(ti,stept,n,re_wr12, im_wr12, re_wr23, im_wr23,G12,G23,n_fourier)
+subroutine f_csection(ti,stept,n,re_wr12, im_wr12, re_wr23, im_wr23,G12,G23,detun,n_fourier)
   use iso_c_binding
   integer ( c_int ),  intent(in) :: n, n_fourier
+  integer ( c_int ), parameter :: k=3
   real ( c_double ),  intent(in) :: ti, stept
   real ( c_double ),  intent(in), dimension(n)  :: re_wr12, im_wr12, re_wr23, im_wr23
   real ( c_double ),  intent(in), dimension(n)  ::  G12,  G23
+  real ( c_double ),  intent(in), dimension(k)  :: detun
   
   !---- interface to csection.c
   interface
-     subroutine csection (  ti,  stept, n, re_wr12,  im_wr12, re_wr23,  im_wr23,  G12,  G23, n_fourier) bind ( c )
+     subroutine csection (  ti,  stept, n, re_wr12,  im_wr12, re_wr23,  im_wr23,  G12,  G23, detun, n_fourier) bind ( c )
        use iso_c_binding
        integer ( c_int ),  VALUE :: n, n_fourier
        real ( c_double ),  VALUE :: ti, stept
        real ( c_double ), dimension(*)  :: re_wr12, im_wr12, re_wr23, im_wr23
-       real ( c_double ), dimension(*)  :: G12, G23
+       real ( c_double ), dimension(*)  :: G12, G23,detun
      end subroutine csection
   end interface
   !print*,"fortran wrap, array size: ",re_wr12(m)
-  call csection (ti,stept,n,re_wr12, im_wr12, re_wr23, im_wr23,G12,G23,n_fourier)
+  call csection (ti,stept,n,re_wr12, im_wr12, re_wr23, im_wr23,G12,G23,detun,n_fourier)
 end subroutine f_csection
