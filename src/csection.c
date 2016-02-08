@@ -22,6 +22,7 @@
 
 int gen_data(int n,double stept_spl,int NTG,int kx,double ti,double *tknot, double *bcoefre, double *bcoefim, fftw_complex *workin);
 int gen_data_real(int n,double stept_spl,int NTG,int kx,double ti,double *tknot,double *bcoefre, fftw_complex *workin);
+int mult_detun(int ntg,double ti,double stept_spl,double detun,fftw_complex *rho_t, int s);
 int do_fft(int NTG,fftw_complex *workin, fftw_complex *workout);
 int center_fft(fftw_complex *out,int N);
 
@@ -143,6 +144,11 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   gen_data_real(n,stept_spl,ntg,kx,ti,tknot,bcoefG12,G12_t);         // G12
   gen_data_real(n,stept_spl,ntg,kx,ti,tknot,bcoefG23,G23_t);         // G23
 
+  // multiply by exp(+s *i * omega * t) ==> R_ij(t) = rho_ij(t) e^{+s *i Omega t}
+  mult_detun(ntg,ti,stept_spl,detun[0],rho12_t,-1);
+  mult_detun(ntg,ti,stept_spl,detun[1],rho23_t,+1);
+  
+
   // free spline coefficient matrices
   free(bcoefre12);free(bcoefim12);
   free(bcoefre23);free(bcoefim23);
@@ -162,6 +168,7 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   
 
   sigma_xas = malloc(ntg * sizeof(double));
+  sigma_rixs = malloc(ntg * sizeof(double));
 
   //--- compute cross-sections -----------------------
 
@@ -169,12 +176,13 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   for(i=0;i<ntg;i++){
     T[0] = ti + i*stept_spl;
 
-    wk[0] = rho12_v[i][0] * G12_v[i][0] - rho12_v[i][1] * G12_v[i][1];
-    wk[1] = rho12_v[i][1] * G12_v[i][0] + rho12_v[i][0] * G12_v[i][1];
-    sigma_xas[i] = wk[1]*cos(detun[0]*T[0]) -  wk[0]*sin(detun[0]*T[0]);
+    //wk[0] = rho12_v[i][0] * G12_v[i][0] + rho12_v[i][1] * G12_v[i][1];
+    //wk[1] = rho12_v[i][1] * G12_v[i][0] - rho12_v[i][0] * G12_v[i][1];
+    sigma_xas[i] = rho12_v[i][1] * G12_v[i][0] - rho12_v[i][0] * G12_v[i][1];
+    sigma_rixs[i] = rho23_v[i][1] * G23_v[i][0] - rho23_v[i][0] * G23_v[i][1];
 
-    fprintf(deb,"%lf %E %E \n",T[0],rho12_t[i][0],rho12_t[i][1],G12_t[i][0],G12_t[i][1] );
-    fprintf(debf,"%lf %E %E %E %E %E \n",E[i],rho12_v[i][0],rho12_v[i][1],G12_v[i][0],G12_v[i][1],sigma_xas[i]);
+    fprintf(deb,"%lf %E %E %E %E \n",T[0],rho12_t[i][0],rho12_t[i][1],G12_t[i][0],G12_t[i][1] );
+    fprintf(debf,"%lf %E %E %E %E %E %E \n",E[i],rho12_v[i][0],rho12_v[i][1],G12_v[i][0],G12_v[i][1],sigma_xas[i],sigma_rixs[i]);
   }
 
   //--------------------------------------------------
@@ -228,6 +236,21 @@ int gen_data_real(int n,double stept_spl,int NTG,int kx,double ti,double *tknot,
 
 //----------------------------
 
+int mult_detun(int ntg,double ti,double stept_spl,double detun,fftw_complex *rho_t, int s){
+  int i;
+  double t;
+
+  for(i=0;i<ntg;i++){
+    t = ti + i*stept_spl;
+    rho_t[i][0] = rho_t[i][0] * cos(detun * t) - s * rho_t[i][1] * sin(detun * t);
+    rho_t[i][1] = rho_t[i][1] * cos(detun * t) + s * rho_t[i][0] * sin(detun * t);
+  }
+
+  return 0;
+}
+
+//---------------------------
+
 int do_fft(int NTG,fftw_complex *workin, fftw_complex *workout){
   // subroutine to perform the fourier transform using fftw
   fftw_plan p;
@@ -236,7 +259,7 @@ int do_fft(int NTG,fftw_complex *workin, fftw_complex *workout){
   //center_fft(workin,NTG); not necessary because we're not inputting data from [-t,t] but rather [0,t]
 
   // FFTW_BACKWARD -> sign in the exponent = 1.
-  p = fftw_plan_dft_1d(NTG,workin,workout,FFTW_BACKWARD,FFTW_ESTIMATE);
+  p = fftw_plan_dft_1d(NTG,workin,workout,FFTW_FORWARD,FFTW_ESTIMATE);
 
   fftw_execute(p);  
 

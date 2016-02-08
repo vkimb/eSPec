@@ -328,15 +328,15 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
      im_rho12_t(i)= rho(1,2)
      re_rho23_t(i)= rho(2,1)
      im_rho23_t(i)= rho(2,2)
-     G12_t(i)= tdipol(1) * E1
-     G23_t(i)= tdipol(2) * E2
+     G12_t(i)= -0.5d0 * tdipol(1) * E1
+     G23_t(i)= -0.5d0 * tdipol(2) * E2
 
      ! to avoid printing issues
-     if(G12_t(i).lt.1.0d-99)then
+     if(abs(G12_t(i)).lt.1.0d-99)then
         G12_t(i) = 0.0d+0
      end if
      
-     if(G23_t(i).lt.1.0d-99)then
+     if(abs(G23_t(i)).lt.1.0d-99)then
         G23_t(i) = 0.0d+0
      end if
 
