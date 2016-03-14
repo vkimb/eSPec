@@ -107,6 +107,9 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
 
   for(i=0;i<n;i++) T[i] = ti + i*stept;
 
+  for(i=0;i<n;i++)fprintf(deb,"%lf %E %E \n",T[i],re_wr12[i],im_wr12[i]);
+  fprintf(deb,"\n\n\n");
+
   dbsnak_ (&n, T, &kx, tknot);
 
   // rho_12
@@ -140,6 +143,13 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   stept_spl = (T[n-1] - T[0])/ntg;
 
   gen_data(n,stept_spl,ntg,kx,ti,tknot,bcoefre12,bcoefim12,rho12_t); // rho_12
+
+  for(i=0;i<ntg;i++){
+    T[0] = ti + i*stept_spl;
+    fprintf(deb,"%lf %E %E \n",T[0],rho12_t[i][0],rho12_t[i][1] );
+  }
+  fprintf(deb,"\n\n\n");
+
   gen_data(n,stept_spl,ntg,kx,ti,tknot,bcoefre23,bcoefim23,rho23_t); // rho_23
   gen_data_real(n,stept_spl,ntg,kx,ti,tknot,bcoefG12,G12_t);         // G12
   gen_data_real(n,stept_spl,ntg,kx,ti,tknot,bcoefG23,G23_t);         // G23
@@ -155,7 +165,7 @@ int csection(double ti, double stept, int n,double *re_wr12, double *im_wr12,dou
   free(bcoefG12);free(bcoefG23);free(tknot);
 
   //--- do fourier transforms ---------------------------
-  stepE = 2*M_PI/(ntg*stept_spl);
+  stepE = 2*M_PI/(ntg*stept_spl*41.3411);
   Ei = -ntg*stepE/(2.0E+0);
   E = malloc(ntg*sizeof(double));
   for(i=0;i<ntg;i++)E[i] = Ei + i*stepE;
@@ -242,6 +252,7 @@ int mult_detun(int ntg,double ti,double stept_spl,double detun,fftw_complex *rho
 
   for(i=0;i<ntg;i++){
     t = ti + i*stept_spl;
+    t = t * 41.3411;
     rho_t[i][0] = rho_t[i][0] * cos(detun * t) - s * rho_t[i][1] * sin(detun * t);
     rho_t[i][1] = rho_t[i][1] * cos(detun * t) + s * rho_t[i][0] * sin(detun * t);
   }

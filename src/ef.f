@@ -42,7 +42,7 @@ c     ** Local scalars
 cdel      LOGICAL       
 cdel      CHARACTER*1   
 cdel      INTEGER       
-      REAL*8        EF, FAT, FATE, FATT, A1, TPA
+      REAL*8        EF, FAT, FATE, FATT, A1, TPA,FATAUD
 c     **
 c     ** External functions 
 cdel      LOGICAL       
@@ -57,11 +57,13 @@ c     ** Intrinsic functions
 cdel      INTRINSIC     
 c     .. Start program
 
-c     vinicius: I believe this conversion is wrong: FAT = +2.1132D-9 correct one FAT = + 2.286337114D-9
-c      FAT = +2.1132D-9
-      FAT = + 2.286337114D-9
+c     vinicius 01/03/16: the FAT conversion includes the intensity conversion times the debye conversion!!!!
+      FAT = +2.1132D-9
       FATE = +2.29371276D+17*3.335664D-28 
       FATT = +1.5192676D+0 
+c the following conversion factor is only used in the ENVG option, considering the transition dipole moment is in au
+      FATAUD=+5.33872839197189D-09
+
       IF(EFC(1:5).EQ.'.GAUS')THEN
 c         IF(T.GT.848.595)E0=0.0D0
 c [1] T. Joseph and J. Mans, Mol. Phys., 1986, Vol. 58, No. 6, 1149-1169
@@ -80,7 +82,7 @@ c      write(*,*)'T,E0,OMG,T0,TP,KL',T,E0,OMG,T0,TP,KL
 c      read(*,*)
          A1 = ONE/(TWO*KL)
          TPA = TP/(0.693147181**A1)
-         EF = FAT*SQRT(E0*EXP(-((T - T0)/TPA)**(TWO*KL))) 
+         EF = FATAUD*SQRT(E0*EXP(-((T - T0)/TPA)**(TWO*KL))) 
 c         write(*,*) T,EF
 c         read(*,*)
       ELSEIF(EFC(1:5).EQ.'.SIN2')THEN

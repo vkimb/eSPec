@@ -39,7 +39,7 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   integer i,j,k,ntime,ierr,dim_int
   integer(kind=C_LONG), dimension(1) :: IPAR=0
   integer(kind=C_LONG), dimension(21) :: IOUT
-  integer(kind=C_LONG) :: j_long
+  integer(kind=C_LONG) :: j_long,max_steps
 
   real(kind=dp), dimension(6) :: ROUT
   real(kind=dp), dimension(1) :: RPAR=0.0d0
@@ -165,7 +165,7 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
 
   !------detuning from resonances
   detun(1) = omega(1) - VMINB
-  detun(2) = omega(2) - (VMINB - VMINC)
+  detun(2) = omega(2) - abs(VMINB - VMINC)
 
 
   call initialize_field(e0,t0,td,tp,detun,sni,kl,tdipol,gamma)
@@ -175,6 +175,7 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   print*,'ti ',ti,'tf ',tf,'step',dt
   print*,'number of points',ntime
   write(*,*)
+
 
   print*,'initialize n vector'
   call FNVINITS(1,psize,ierr);call chkierr(ierr)
@@ -187,6 +188,10 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
        IOUT, ROUT, & ! Integer and real optional outputs
        IPAR, RPAR, & ! Integer and real optional parameters
        ierr);call chkierr(ierr)
+  
+  !change number of steps
+  max_steps = 10000
+  CALL FCVSETIIN('MAX_NSTEPS',max_steps,ierr);call chkierr(ierr)
 
   ! call FCVMALLOC(ti, Y, 2, & ! 2 = BDF, 1 = Adams
   !      1, & ! 1 = functional iteration, 2 = Newton iteration
@@ -357,7 +362,6 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   write(*,*) 'Computing Cross-sections'
   c_ti=ti; c_stept=dt
   call f_csection (c_ti,c_stept,c_ntime,re_rho12_t,im_rho12_t,re_rho23_t,im_rho23_t,G12_t,G23_t,detun,m_fourier)
-  
 
   t_ierr = 0
 
