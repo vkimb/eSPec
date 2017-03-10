@@ -58,7 +58,7 @@ cdel      INTEGER
       REAL*8        ECNORM, RAN
 c     **
 c     ** External subroutines 
-      EXTERNAL      LNZ, REORT, AU, DSTEVX
+!      EXTERNAL      LNZ, REORT, AU !, DSTEVX
 c     **
 c     ** Intrinsic functions 
 cdel      INTRINSIC     

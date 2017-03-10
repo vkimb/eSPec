@@ -685,7 +685,8 @@ c
       ENDIF
 c 
       IF(NPR+KP.GT.NIS)NPR = NPR - NIS
-      IF(NPR.GT.6)NPR = 6
+c     [2017-03-06] Andrei: WTF? Commenting out the line below.
+c      IF(NPR.GT.6)NPR = 6
 c
       IF(TPPROPG(1:7).EQ.'.P2PABM' .AND. VFY(1) .NE. ZERO .AND.
      &     TPPROPG(1:8).NE.'.P2PABM2')THEN

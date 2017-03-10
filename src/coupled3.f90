@@ -1,6 +1,6 @@
 subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gamma,&
      tdipol,omega,e0,tp,td,t0,sni,kl,ti,tf,dt,nshot,mxdct,lmtreort,eigA,eigB,eigC,nstates,&
-     prteigvc2,m_fourier,t_ierr)
+     prteigvc2,m_fourier,t_ierr,absorb,VABC)
   !------------------------------------------------------
   !     
   !     subroutine to compute wavepacket propagation 
@@ -28,11 +28,11 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   real(kind=dp) VMINB,VMINC,t,dt, ti, tf,EF,xp,tout,start_t,stop_t,t_total
   real(kind=dp), dimension(3) :: omega,e0,tp,td,t0,sni,tdipol,shm,sh,xi,gamma
   real(kind=dp), dimension(mxdct), intent(in) :: U0_in,V0_in
-  real(kind=dp), dimension(mxdct), intent(in) :: VPOT_in
+  real(kind=dp), dimension(mxdct), intent(in) :: VPOT_in,VABC
   real(kind=dp), dimension(3*n) :: VPOT
   real(kind=dp), dimension(6*n) :: Y, F, HY
   real(kind=dp), intent(in), dimension(mxdct,lmtreort) :: eigA,eigB,eigC
-  logical, intent(in) :: prteigvc2
+  logical, intent(in) :: prteigvc2,absorb
   integer, intent(out) :: t_ierr
 
   !-----local variables
@@ -257,6 +257,12 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
      call cpu_time(stop_t)
      !--------------------------------------
 
+     !---- apply absorbing boundary conditions
+     if(absorb)then
+        call wp3_absorb(Y,n,mxdct,VABC)
+     end if
+
+
      !-- reinitialize problem
      call FCVREINIT(t,Y,1,1.0d-16,1.0d-16,ierr); call  chkierr(ierr)
      !-----------------------
@@ -287,9 +293,9 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
            STOP
         ENDIF
 
-        CALL PRPT2(NEWNAM1,8,ND,t/fs2au,NP,XP,XI,SH,Y(1:n),Y(n+1:2*n))
-        CALL PRPT2(NEWNAM2,8,ND,t/fs2au,NP,XP,XI,SH,Y(2*n+1:3*n),Y(3*n+1:4*n))
-        CALL PRPT2(NEWNAM3,8,ND,t/fs2au,NP,XP,XI,SH,Y(4*n+1:5*n),Y(5*n+1:6*n))
+        CALL PRPT2(NEWNAM1,8,ND,t,NP,XP,XI,SH,Y(1:n),Y(n+1:2*n))
+        CALL PRPT2(NEWNAM2,8,ND,t,NP,XP,XI,SH,Y(2*n+1:3*n),Y(3*n+1:4*n))
+        CALL PRPT2(NEWNAM3,8,ND,t,NP,XP,XI,SH,Y(4*n+1:5*n),Y(5*n+1:6*n))
         !-----------------------------------------------------------------
      end if
 
@@ -301,8 +307,10 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
      !---------------
 
 
-     !-- check norm
+     !-- apply absorbing boundary conditions and check norm of wavepacket
+   
      call wp3_norm(Y,n,norm)
+
      norm_diff = dabs(norm_last - (norm(1)+norm(2)+norm(3)) )
      norm_last = norm(1)+norm(2)+norm(3)
      write(*,'(6ES21.9,5X,F5.2,A2)')t,norm(1),norm(2),norm(3),norm(1)+norm(2)+norm(3),norm_diff,stop_t-start_t,'s'
@@ -463,6 +471,39 @@ subroutine wp3_rho(Y,n,rho)
   end do
 
 end subroutine wp3_rho
+
+
+!---------------------------------
+!  wavepacket smooth absorbing condition
+!---------------------------------
+subroutine wp3_absorb(Y,n,mxdct,VABC)
+  use iso_c_binding
+  integer, parameter :: dp=kind(1.0d00)
+  integer, intent(in)  :: n,mxdct
+  real(kind=dp), dimension(mxdct),intent(in) :: VABC
+  real(kind=dp), dimension(6*n),intent(inout) :: Y
+
+  integer(kind=C_LONG) i,jr,ji
+
+  do i=1,n
+     jr = i; ji = n + i;
+     Y(jr) = Y(jr) * VABC(i)
+     Y(ji) = Y(ji) * VABC(i)
+
+     jr = 2*n + i; ji = 3*n + i;
+     Y(jr) = Y(jr) * VABC(i)
+     Y(ji) = Y(ji) * VABC(i)
+
+     jr = 4*n + i; ji = 5*n + i;
+     Y(jr) = Y(jr) * VABC(i)
+     Y(ji) = Y(ji) * VABC(i)
+  end do
+
+end subroutine wp3_absorb
+
+
+
+
 
 
 !---------------------------------

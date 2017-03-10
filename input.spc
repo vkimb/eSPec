@@ -2,21 +2,17 @@
 ========================
 **MAIN
 *TITLE
- +++++ eSPec input file test 2 +++++
+ +++++ COUPLE3 test +++++    
 *DIMENSION
 .1D
- 560/
+ 512/
 *POTENTIAL
-.OHS   !.OHS; .MORSE
- 1.14600  1943.79/
- 1.21100  1629.23/
-*GRID_RANGES
- 0.5  2.8/
+.FILE
+water_2b2_Qs.dat
 *MASS
- 7.49D0/
+1.04445D+0/
 *TPCALC
-.SPECTRUM
-.TD
+.PROPAGATION
 *INIEIGVC
 .CALC
 *CHANGE
@@ -24,21 +20,23 @@
 *PRTCRL
 .PARTIAL
 *PRTPOT
-.YES
+.NO
 *PRTEIGVC
 .YES
 *PRTVEFF
 .NO
 *PRTEIGVC2
-.NO
+.NO ! .YES for movie.gplt
 *PRTPULSE
-.NO
+.YES
 *PRTDIPOLE
+.NO
+*CHANGE
 .NO
 
 **TI
 *TPDIAG
-.LANCZS   !.LANCZS; MTRXDIAG 
+.MTRXDIAG  !.LANCZS; MTRXDIAG 
 *NIST
  7  0/
 *ABSTOL
@@ -46,25 +44,25 @@
 
 **TD
 *PROPAG
-.PPSOD
- 0.0  199.87  5D-5/
+.COUPLE3
+ 0.0  300.0 0.1d0/
+.PULSES
+1.0D+17 5.0 536.283 150D+0   0   1.0/
+0.0D+00  10 400 150D+0  0   1.0/
+.DECAYS
+0.0 0.08 0.0/
+.TDIPOL
+0.0243 0.0d+0/
 *PRPGSTATE
- 2/
+ 0/
 *TPTRANS
 .ONE
 *PRPTOL
- 3.0D0/
+ 3D0/
 *NPROJECTIONS
  6  1
-
-**SPECTRUM
 *FOURIER
- 14/
-*HWHM
- 0.1  1.0  50.0  9.0/
+10/
+
 **END
-
-
-
-
 

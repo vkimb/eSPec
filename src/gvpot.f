@@ -57,6 +57,10 @@ cdel      INTRINSIC
 c     .. Start program
       VPOTAUX = 1.0D+99
 c
+      write(*,*) " [gvpot.f::gvpot] Data on input "
+      write(*,*) " DIM = ", DIM
+      write(*,*) " NP = ", NP(1)
+      write(*,*) " XI, SH = ", XI(1), SH(1)
       IF(DIM(1:3).EQ.'.1D')THEN
          DO I=1,NP(1),1
             RX = XI(1) + (I - 1)*SH(1)

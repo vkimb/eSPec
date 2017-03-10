@@ -539,7 +539,7 @@ c     ..
      &     ,4X,'*Pi(t)*',3X,8(A3,I1,A4,3X)) 
  1012 FORMAT(/,8X,'*t/fs*',5X,'*ET/a.u.*',6X,'*E0/a.u.*',6X,'*Pr(t)*'
      &     ,4X,'*Pi(t)*',3X,8(A3,I2,A4,3X))
- 1021 FORMAT(1X,F14.6,3X,2(E12.6,3X),2(F8.5,3X),10(F8.6,3X))
+ 1021 FORMAT(2X,F17.6,3X,2(E17.6,3X),2(F10.5,3X),10(F10.6,3X))
  1031 FORMAT('plot "',A14,'" title ''',F9.4,1X,
      &     'fs'' with lines lw 2.0, ','"',A13,
      &     '" notitle with lines lw 2.1, ',

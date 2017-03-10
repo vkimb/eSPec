@@ -1,4 +1,5 @@
-        PROGRAM eSPec
+      PROGRAM eSPec
+      use io
       IMPLICIT NONE
 c     **
 *     ..
@@ -62,11 +63,18 @@ c     strong field variables
       
 c     ** 
 c     ** Parameters 
-      INCLUDE "param.f" !This file contain the parameters used by the main program, 
+cf      INCLUDE "param.f" !This file contain the parameters used by the main program, 
 c for change in the dimensions have a look on. There you can change everything you 
 c want and recompile espec using 'make veryclean; make' command. 
       REAL*8        ZERO, ONE, TWO, SHBAR, SHCGS, CCGS, A0CGS, A0A, TAU
       REAL*8        TWOPI
+      INTEGER LMTREORT, MXCST,  MXDCT, MXDM, MXAUX
+      PARAMETER  (
+     & LMTREORT = 50, 
+     & MXCST = 14,
+     & MXDCT = 1048586,
+     & MXDM = 3,
+     & MXAUX = LMTREORT*MXDCT)
       PARAMETER     (
      &     ZERO  = +0.0D+0, 
      &     ONE   = +1.0D+0, 
@@ -101,7 +109,10 @@ cdel      CHARACTER
       REAL*8        DLAMCH
 c     **
 c     ** External subroutines 
-      EXTERNAL      RDINPUT, MAKECST, RDPT, GVPOT, MTRXDIAG, LANCZS
+c     [2017-03-10] Andrei: Replacing creepy RDINPUT with io.f90::RDINPUT
+c      EXTERNAL      RDINPUT, MAKECST, RDPT, GVPOT, MTRXDIAG, LANCZS
+      EXTERNAL      MAKECST, RDPT, GVPOT, MTRXDIAG, LANCZS
+c     [END]
       EXTERNAL      DFDXI, RIF, PSOD, PLNZ, SPECTRUMTD, SPECTRUMTI
       EXTERNAL      GETCORR, PRTPT, PRTEIGVC, PPSOD, PSPOFFT, PPLNZ
       EXTERNAL      DIPLMMT, HWHM, ABSORBINGBC, S2PPSOD, S2PPABM2
@@ -154,7 +165,7 @@ c     .. Starting scalar default values
       IIU = ZERO
       IFL = ZERO
       IFU = ZERO
-      MAXINT = 300
+      MAXINT = 500
       MF     = +1.3D+1
       MP     = +1.0D+1
       NIS    = ONE
@@ -246,6 +257,7 @@ c     .. Getting input parameters
 C,PRTABS)
       WRITE(*,*)'Input parameters got.'
 c
+      write(*,*) " [debug] POTCH = ", POTCH
       IIL = IIL + ONE
       IIU = IIU + ONE
       IFL = IFL + ONE
@@ -880,6 +892,7 @@ c            print *, '2 rk(1), rk(2)', rk(1), rk(2)
             GOTO 300
          ELSE
             WRITE(*,1003)'Generating initial potential...' 
+            write(*,*) " [debug] POTCH = ", POTCH
             CALL GVPOT(SHIFTP, POTCH, DIM, NP, XI, XF, XMIN, SM, SH, 
      &           CSTI, VPOT)
             WRITE(*,*)'Initial potential generated.'
@@ -1257,11 +1270,11 @@ cccccccccccc
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCc
 cccccccccccccc Vinicius 18/10/2011
-            IF(PRTABS) THEN
-            write(*,*)'***********Absorbing Boundary Condition'
-            CALL PRTPT(POTCHF, 6, ND, ZERO, NP, XP, XI, SH, VABC)
-            write(*,*)'***********'
-            ENDIF
+c            IF(PRTABS) THEN
+c            write(*,*)'***********Absorbing Boundary Condition'
+c            CALL PRTPT(POTCHF, 6, ND, ZERO, NP, XP, XI, SH, VABC)
+c            write(*,*)'***********'
+c            ENDIF
 cccccccccccccc Vinicius 18/10
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCcc
 
@@ -1647,7 +1660,8 @@ c     strong field interaction
                CALL coupled3(DIM,ND,NT,NP,XP,XI,SH,SHM,U1,V1,VPOT,VMINB,
      &              VMINC,gamma3,TDIPOL,OMG3,E03,TP3,TD3,T03,SNI3,
      &              KL3,TI,TF,DT,NSHOT,MXDCT,LMTREORT,
-     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES,PRTEIGVC2,MF,IERR)
+     &              EIGVC,EIGVC_B,EIGVC_C,NSTATES,PRTEIGVC2,MF,IERR,
+     &              ABSORB,VABC)
                
                IF(IERR.NE.0)THEN
                   write(*,*) 'error in the coupled propagation!'
