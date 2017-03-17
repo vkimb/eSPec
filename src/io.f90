@@ -1,5 +1,5 @@
 module io
-
+  use rtlib
   public :: RDINPUT
   private
 
@@ -55,7 +55,8 @@ contains
     integer :: ios = 0, line = 0, funit=10, pos ! Note that funit=10 is arbitrary. It could be any unit you want.
     integer :: ierr
     real    :: timescan
-    logical :: dim_initialized = .FALSE., seed_initialized=.FALSE., nshot_initialized=.FALSE.
+    logical :: dim_initialized = .FALSE., seed_initialized=.FALSE.,&
+         & nshot_initialized=.FALSE., chirping_initialized=.FALSE.
     character(len=128) :: buffer, another_buffer, label    
     character(len=32)  :: filename
 
@@ -90,6 +91,10 @@ contains
                 write(*,*) "TPCLC = ", TPCLC, "; Exiting, do not know how to proceed. "
                 stop
              end select
+          case ('*CHIRPING')
+             read(funit, *, iostat=ierr) rt%chirp_1p, rt%chirp_2p; call chkioerr(ierr&
+                  &,info="*CHIRPING")
+             chirping_initialized = .TRUE.
           case ('*DIMENSION')
              read(funit, *, iostat=ierr) DIM; call chkioerr(ierr,info="*DIMENSION")
              write(*,*) " [*DIMENSION]: ", DIM
@@ -349,6 +354,10 @@ contains
              call chkioerr(ierr,info="*PROPAG: (.COUPLE3: .PULSES (2) )")
              KL3(1) = SKL3(1)
              KL3(2) = SKL3(2)
+             rt%omega0_1p = ev_to_ha(OMG3(1))
+             rt%omega0_2p = ev_to_ha(OMG3(2))
+             rt%phase_1p  = SNI3(1)
+             rt%phase_2p  = SNI3(2)
              write(*,*) " * Pulses output: " 
              write(*,*) " E03 = ", E03(:)
              write(*,*) " TP3 = ", TP3(:)
@@ -419,6 +428,14 @@ contains
        end if
     end do
 
+    if (.not.(chirping_initialized)) then
+       rt%chirp_1p = 0.0d0
+       rt%chirp_2p = 0.0d0
+    end if
+    
+    
+
+    
     ! ### Arbitrary code used in the RDINPUT.f ### 
     IF(DIM(1:3).EQ.'.1D')THEN
        DO I=2,MXDM,1

@@ -91,19 +91,25 @@ contains
     ! write(*,*)e0(2),t0(2),td(2),tp(2),detun(2),sni(2),kl(2)
     ! read(*,*)
 
+    ! [2017-03-17] Andrei :: Detuning is NOT used inside the EF()
+    ! function. This function returns only a gaussian envelope.
     E1 = EF(pul,e0(1),t0(1),td(1),tp(1),detun(1),sni(1),kl(1),t/fs2au)
     E2 = EF(pul,e0(2),t0(2),td(2),tp(2),detun(2),sni(2),kl(2),t/fs2au)   
-    
+
+        
     !write(43,*)t/fs2au,E1,E2
 
     G(1) = -0.5D+0 * (E1 * tdipol(1)) ! G12
     G(2) = -0.5D+0 * (E2 * tdipol(2)) ! G23 = G32*   
 
     !-------- temporal oscilation within RWA
-    CSD(1) = dcos(detun(1) * t)
-    SND(1) = dsin(detun(1) * t)
-    CSD(2) = dcos(detun(2) * t)
-    SND(2) = dsin(detun(2) * t)
+    ! [2017-03-17] Andrei :: Pulse chirping and initial phase are
+    ! added below.
+    CSD(1) = dcos((detun(1)+rt%chirp_1p*(t-t0(1))**2) * t + rt%phase_1p)
+    SND(1) = dsin((detun(1)+rt%chirp_1p*(t-t0(1))**2) * t + rt%phase_1p)
+    CSD(2) = dcos((detun(2)+rt%chirp_2p*(t-t0(2))**2) * t + rt%phase_2p)
+    SND(2) = dsin((detun(2)+rt%chirp_2p*(t-t0(2))**2) * t + rt%phase_2p)
+    ! [end]
     
     !----------------------------
     !---------Set right hand side

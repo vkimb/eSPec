@@ -12,7 +12,6 @@ PROG = espec_v$(VERSION).x
 #   FFLAGS = -fast -traceback
 MKLI= #/software/apps/intel/compilers_and_libraries_2016.0.109/linux/mkl/include
 MKLL= #/software/apps/intel/compilers_and_libraries_2016.0.109/linux/mkl/lib
-TRIOLITH=-I${MKLI} -L${MKLL}
 
 LIBRARIES=/opt/sundials/lib
 INCLUDE=/opt/sundials/include
@@ -74,7 +73,7 @@ ESPEC_OBJS = src/rdinput.o src/compar.o src/chlength.o src/rdpt.o \
 	src/eigenergfft1.o src/absorb.o src/s2ppsod.o src/abm1.o \
 	src/s2ppabm.o src/sod1.o src/s2ppabm2.o src/init_cond.o src/gauss.o \
 	src/ap1d.o src/ap2d.o src/ap2dct.o src/au2dct.o src/coupled3.o src/rdpt-min.o\
-	src/rhside.o src/csection.o src/splinesurf.o src/io.o
+	src/rhside.o src/csection.o src/splinesurf.o src/io.o src/rtlib.o
 #
 XESPEC_OBJS =	
 #
@@ -127,13 +126,14 @@ all:
 	echo 'Program fluxp compiled!'
 
 #
-espec:  $(OBJS)
+espec:  $(OBJS) src/*.f src/*.f90
+	make src/rtlib.o
 	make src/coupled3.o
 	make src/io.o
 	#make blas
 	make ffts
 	#make lapack
-	$(FC) -o $(PROG) $(OBJS) $(BLAS_OBJS) $(LAPACK_OBJS) $(FFTS_OBJS) $(LDFLAGS) $(TRIOLITH)
+	$(FC) -o $(PROG) $(OBJS) $(BLAS_OBJS) $(LAPACK_OBJS) $(FFTS_OBJS) $(LDFLAGS) 
 	size $(PROG)
 	ln -sf $(PROG) espec.x
 	chmod a+xr $(PROG) espec.x
@@ -151,6 +151,12 @@ src/rhside.o: src/rhside.f90
 	$(FC) -c src/rhside.f90
 	mv rhside.o src/
 	cp rhside.mod src/
+#
+src/rtlib.o: src/rtlib.f90
+	${FC} -c src/rtlib.f90
+	cp rtlib.o src/
+	cp rtlib.mod src/
+
 #
 normf:  src/normfs.o src/ecnorm.o src/spline.o src/chlength.o $(BLAS_OBJS)
 	make ffts

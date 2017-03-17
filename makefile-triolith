@@ -74,7 +74,7 @@ ESPEC_OBJS = src/rdinput.o src/compar.o src/chlength.o src/rdpt.o \
 	src/eigenergfft1.o src/absorb.o src/s2ppsod.o src/abm1.o \
 	src/s2ppabm.o src/sod1.o src/s2ppabm2.o src/init_cond.o src/gauss.o \
 	src/ap1d.o src/ap2d.o src/ap2dct.o src/au2dct.o src/coupled3.o src/rdpt-min.o\
-	src/rhside.o src/csection.o src/splinesurf.o src/io.o
+	src/rhside.o src/csection.o src/splinesurf.o src/io.o src/rtlib.o
 #
 XESPEC_OBJS =	
 #
@@ -142,6 +142,11 @@ espec:  $(OBJS)
 src/io.o: src/io.f90
 	${FC} -c src/io.f90
 	mv io.o src/
+
+src/rtlib.o: src/rtlib.f90
+	${FC} -c src/rtlib.f90
+	mv rtlib.o src/
+	cp rtlib.mod src/
 
 src/coupled3.o: src/coupled3.f90
 	$(FC) -c src/coupled3.f90

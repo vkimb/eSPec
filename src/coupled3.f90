@@ -13,6 +13,7 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   !------------------------------------------------------
 
   use rhside
+  use rtlib
   use iso_c_binding
   !include ’fftw3.f03’
 
@@ -166,7 +167,8 @@ subroutine coupled3(dim,nd,n,np,xp,xi,sh,shm,U0_in,V0_in,VPOT_in,VMINB,VMINC,gam
   !------detuning from resonances
   detun(1) = omega(1) - VMINB
   detun(2) = omega(2) - abs(VMINB - VMINC)
-
+  rt%resonant_energy_potAB = VMINB
+  rt%resonant_energy_potBC = abs(VMINB-VMINC)
 
   call initialize_field(e0,t0,td,tp,detun,sni,kl,tdipol,gamma)
 
