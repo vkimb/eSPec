@@ -1,4 +1,5 @@
       FUNCTION EF(EFC, E0, T0, TD, TP, OMG, SNI, KL, T)
+      use rtlib
       IMPLICIT NONE
 c     **
 c     ** Scalar arguments 
@@ -64,40 +65,49 @@ c     vinicius 01/03/16: the FAT conversion includes the intensity conversion ti
 c the following conversion factor is only used in the ENVG option, considering the transition dipole moment is in au
       FATAUD=+5.33872839197189D-09
 
-      IF(EFC(1:5).EQ.'.GAUS')THEN
-c         IF(T.GT.848.595)E0=0.0D0
-c [1] T. Joseph and J. Mans, Mol. Phys., 1986, Vol. 58, No. 6, 1149-1169
-         EF = E0*EXP(-4.0D+0*0.693147181D+0*(T - T0)
-     &        *(T - T0)/(TP*TP))*COS(OMG*T*FATT + SNI) ![1] 
-         EF = EF*FATE ! V/cm = J/(C*cm) -> a.u./D
-      ELSEIF(EFC(1:6).EQ.'.GGAUS')THEN
-c         write(*,*)'T,E0,OMG,T0,TP,KL',T,E0,OMG,T0,TP,KL
-c         read(*,*)
-         A1 = ONE/(TWO*KL)
-         TPA = TP/(0.693147181**A1)
-         EF = FAT*SQRT(E0*EXP(-((T - T0)/TPA)**(TWO*KL)))
-     &        *COS(OMG*T*FATT + SNI)
-      ELSEIF(EFC(1:5).EQ.'.ENVG')THEN
+c
+c     [2017-03-17] Andrei: I deliberatly break the functionality below. It will appera      
+      if (EFC(1:5).NE.'.ENVG') then
+         write(*,*) "[ef.f] ERROR: Unsupported pulse shape. &
+     &   Check the EFC keyword. This functionality was deliberatly &
+     &   broken. "
+         stop
+      end if
+c$$$      IF(EFC(1:5).EQ.'.GAUS')THEN
+c$$$c         IF(T.GT.848.595)E0=0.0D0
+c$$$c [1] T. Joseph and J. Mans, Mol. Phys., 1986, Vol. 58, No. 6, 1149-1169
+c$$$         EF = E0*EXP(-4.0D+0*0.693147181D+0*(T - T0)
+c$$$     &        *(T - T0)/(TP*TP))*COS(OMG*T*FATT + SNI) ![1] 
+c$$$         EF = EF*FATE ! V/cm = J/(C*cm) -> a.u./D
+c$$$      ELSEIF(EFC(1:6).EQ.'.GGAUS')THEN
+c$$$c         write(*,*)'T,E0,OMG,T0,TP,KL',T,E0,OMG,T0,TP,KL
+c$$$c         read(*,*)
+c$$$         A1 = ONE/(TWO*KL)
+c$$$         TPA = TP/(0.693147181**A1)
+c$$$         EF = FAT*SQRT(E0*EXP(-((T - T0)/TPA)**(TWO*KL)))
+c$$$     &        *COS(OMG*T*FATT + SNI)
+c$$$      ELSEIF(EFC(1:5).EQ.'.ENVG')THEN
 c      write(*,*)'T,E0,OMG,T0,TP,KL',T,E0,OMG,T0,TP,KL
 c      read(*,*)
-         A1 = ONE/(TWO*KL)
-         TPA = TP/(0.693147181**A1)
-         EF = FATAUD*SQRT(E0*EXP(-((T - T0)/TPA)**(TWO*KL))) 
-c         write(*,*) T,EF
-c         read(*,*)
-      ELSEIF(EFC(1:5).EQ.'.SIN2')THEN
-         EF = E0*COS(PI*(T - TD)/TP)*COS(PI*(T - TD)/TP)
-     &        *COS(OMG*(T - TD)*FATT + SNI)
-         EF = EF*FATE           ! V/cm = J/(C*cm) -> a.u./(D)
-      ELSEIF(EFC(1:5).EQ.'.NONE' .OR. EFC(1:5).EQ.'.NULL')THEN
-         EF = ZERO
-      ELSE
-         WRITE(*,1001)
-         STOP
-      ENDIF
+      A1 = ONE/(TWO*KL)
+      TPA = TP/(0.693147181**A1)
+      EF = FATAUD*SQRT(E0*EXP(-((T - T0)/TPA)**(TWO*KL))) 
+c$$$c         write(*,*) T,EF
+c$$$c         read(*,*)
+c$$$      ELSEIF(EFC(1:5).EQ.'.SIN2')THEN
+c$$$         EF = E0*COS(PI*(T - TD)/TP)*COS(PI*(T - TD)/TP)
+c$$$     &        *COS(OMG*(T - TD)*FATT + SNI)
+c$$$         EF = EF*FATE           ! V/cm = J/(C*cm) -> a.u./(D)
+c$$$      ELSEIF(EFC(1:5).EQ.'.NONE' .OR. EFC(1:5).EQ.'.NULL')THEN
+c$$$         EF = ZERO
+c$$$      ELSE
+c$$$         WRITE(*,1001)
+c$$$         STOP
+c$$$      ENDIF
+c$$$c
+c$$$ 1001 FORMAT('<<<>>> Desired laser pulse wasn´t found. <<<>>>')
 c
- 1001 FORMAT('<<<>>> Desired laser pulse wasn´t found. <<<>>>')
-c
+c     [end]
       RETURN
       END
 
